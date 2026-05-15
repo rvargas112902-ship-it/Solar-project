@@ -163,6 +163,7 @@ def create_dashboard_art(path: Path):
     img.save(path)
 
 PAGE_W, PAGE_H = landscape(letter)
+TOTAL_PAGES = 12
 
 NAVY = colors.HexColor("#071B33")
 NAVY_2 = colors.HexColor("#0B2747")
@@ -230,6 +231,9 @@ BODY = style("Body", 10, 13, INK)
 BODY_WHITE = style("BodyWhite", 10.5, 14, WHITE)
 SMALL = style("Small", 8.2, 10.2, SLATE)
 SMALL_WHITE = style("SmallWhite", 8.5, 10.5, ICE)
+TINY = style("Tiny", 7.4, 9.2, SLATE)
+TINY_DARK = style("TinyDark", 7.4, 9.2, INK)
+TINY_WHITE = style("TinyWhite", 7.5, 9.4, ICE)
 QUOTE = style("Quote", 15, 19, WHITE, "Helvetica-Bold")
 CENTER = style("Center", 10, 13, INK, align=TA_CENTER)
 
@@ -311,14 +315,14 @@ def footer(c: canvas.Canvas, page_num: int, title: str, dark=False):
     c.setFillColor(ICE if dark else SLATE)
     c.drawString(40, 16, "SOLAR SETTER FIELD DECK")
     c.drawCentredString(PAGE_W / 2, 16, title.upper())
-    c.drawRightString(PAGE_W - 40, 16, f"{page_num:02d} / 10")
+    c.drawRightString(PAGE_W - 40, 16, f"{page_num:02d} / {TOTAL_PAGES}")
     c.restoreState()
 
 
 def title_block(c: canvas.Canvas, eyebrow: str, title: str, subtitle: str, page_num: int, dark=False):
     pill(c, 44, PAGE_H - 70, 128, 20, eyebrow, TEAL if dark else NAVY, txt=WHITE)
-    paragraph(c, title, 44, PAGE_H - 88, 520, H2_LIGHT if dark else H2)
-    paragraph(c, subtitle, 45, PAGE_H - 122, 480, BODY_WHITE if dark else BODY)
+    title_bottom = paragraph(c, title, 44, PAGE_H - 88, 520, H2_LIGHT if dark else H2)
+    paragraph(c, subtitle, 45, title_bottom - 8, 520, BODY_WHITE if dark else BODY)
     footer(c, page_num, title, dark=dark)
 
 
@@ -781,23 +785,524 @@ def page_standards(c):
     footer(c, 10, "Field Commandments", dark=True)
 
 
+def labeled_script_box(c, x, y, w, h, label, text, accent=TEAL, text_style=SMALL):
+    card(c, x, y, w, h, fill=WHITE, radius=13, shadow=False)
+    c.setFillColor(accent)
+    c.roundRect(x, y + h - 25, w, 25, 13, stroke=0, fill=1)
+    c.setFillColor(WHITE if accent != ORANGE else NAVY)
+    c.setFont("Helvetica-Bold", 8.5)
+    c.drawString(x + 12, y + h - 17, label.upper())
+    paragraph(c, text, x + 13, y + h - 34, w - 26, text_style)
+
+
+def compact_metric(c, x, y, w, num, label, accent=TEAL):
+    card(c, x, y, w, 58, fill=WHITE, radius=13, shadow=False)
+    c.setFillColor(accent)
+    c.setFont("Helvetica-Bold", 19)
+    c.drawString(x + 12, y + 30, num)
+    paragraph(c, label, x + 12, y + 24, w - 24, TINY)
+
+
+def team_page_cover(c, assets):
+    background(c, 1, dark=True)
+    if assets["cover"] and assets["cover"].exists():
+        c.drawImage(str(assets["cover"]), 430, 88, 318, 318, preserveAspectRatio=True, anchor="c", mask="auto")
+    c.setFillColor(hex_alpha("#071B33", 0.90))
+    c.roundRect(38, 54, 430, 502, 26, stroke=0, fill=1)
+    pill(c, 62, 514, 196, 22, "duke-market team playbook", TEAL)
+    paragraph(c, "Solar Setter Field Card Deck", 62, 474, 360, H1)
+    paragraph(
+        c,
+        "A team-specific door playbook for powerline/rate-pain openers, Duke bill pulls, walk-in sits, appointment setting, A.R.C. objection handling, and daily performance standards.",
+        64,
+        357,
+        345,
+        BODY_WHITE,
+    )
+    c.setStrokeColor(ORANGE)
+    c.setLineWidth(4)
+    c.line(64, 323, 172, 323)
+    bullet_list(
+        c,
+        [
+            "<b>Door goal:</b> create urgency, get the bill, and move to a sit or a locked appointment.",
+            "<b>Team standard:</b> 80 doors, 2 sits or 1 sale; misses receive a strike.",
+            "<b>Meeting cadence:</b> 9:30am morning meetings for roleplay, objections, and assignments.",
+        ],
+        64,
+        294,
+        340,
+        BODY_WHITE,
+        bullet_color=ORANGE,
+        gap=8,
+    )
+    card(c, 64, 70, 340, 72, fill=hex_alpha("#FFFFFF", 0.08), stroke=hex_alpha("#FFFFFF", 0.18), radius=14, shadow=False)
+    paragraph(
+        c,
+        "<b>Compliance note:</b> Use the Duke powerline/rate message only where leadership has verified the local utility facts and approved the exact wording for that territory.",
+        82,
+        119,
+        302,
+        TINY_WHITE,
+    )
+    footer(c, 1, "Team Playbook", dark=True)
+
+
+def team_page_pitch(c, assets):
+    background(c, 2)
+    title_block(
+        c,
+        "slide 02",
+        "Team Door Pitch: Powerlines -> Pain",
+        "Your opener creates context, gets a micro-agreement, and makes the bill conversation feel natural.",
+        2,
+    )
+    draw_image(c, assets["door"], 520, 124, 216, 286)
+    labeled_script_box(
+        c,
+        48,
+        366,
+        444,
+        76,
+        "1. opener + visual anchor",
+        '"Hey listen, I do not have much time. Do you see these power lines here?" <b>(Point at the power lines.)</b> "They are going underground."',
+        TEAL,
+        SMALL,
+    )
+    labeled_script_box(
+        c,
+        48,
+        276,
+        444,
+        78,
+        "2. storm context + micro-agreement",
+        '"Most people lost power during the storms. The idea is that if something catastrophic happens, people are protected and able to have power. Does that make sense?" <b>(Get micro-agreement.)</b>',
+        ORANGE,
+        SMALL,
+    )
+    labeled_script_box(
+        c,
+        48,
+        175,
+        444,
+        88,
+        "3. neighbor pain + Duke bill increase",
+        '"The only thing is, neighbors are frustrated. The way Duke pays for all that work is through us. You probably saw the news, but the electric bill is going up $48 every single month starting this month."',
+        RED,
+        TINY_DARK,
+    )
+    labeled_script_box(
+        c,
+        48,
+        76,
+        444,
+        86,
+        "4. contrast + permission to qualify",
+        '"No one is happy paying more money for the same amount of power. We might not be able to help here, but if we can cover the power you are using with Duke, we can see if you qualify to get it significantly cheaper."',
+        NAVY,
+        TINY_DARK,
+    )
+    card(c, 520, 68, 216, 44, fill=NAVY, stroke=NAVY, radius=13, shadow=False)
+    paragraph(c, "<b>Tone:</b> urgent, local, calm. Do not sound like a debate or a lecture.", 538, 97, 180, TINY_WHITE)
+
+
+def team_page_pain_bill(c):
+    background(c, 3)
+    title_block(
+        c,
+        "slide 03",
+        "Build Pain + Pull the Duke Bill",
+        "The bill is the bridge from interest to action. Ask with confidence and make it feel routine.",
+        3,
+    )
+    card(c, 50, 278, 320, 162, fill=WHITE, radius=18)
+    c.setFillColor(NAVY)
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(74, 410, "Bill-size disqualifier")
+    paragraph(
+        c,
+        '"The only problem is, most neighbors we spoke with are only paying $35 or $40 a month. If you are around that, we probably cannot help here. What is your lowest Duke bill here?"',
+        74,
+        388,
+        270,
+        BODY,
+    )
+    bullet_list(
+        c,
+        [
+            '<b>Reaction:</b> "Wowww..." then pause.',
+            '<b>Dig:</b> "Do you guys have a pool or a big family here?"',
+            '<b>Purpose:</b> let them feel the pain before you explain the solution.',
+        ],
+        74,
+        322,
+        266,
+        SMALL,
+        ORANGE,
+        gap=6,
+    )
+    card(c, 394, 278, 348, 162, fill=WHITE, radius=18)
+    c.setFillColor(NAVY)
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(418, 410, "Solution: the squiggly line")
+    paragraph(
+        c,
+        '"The only thing we need to see is the little squiggly line on your electric bill." <b>(Show the picture.)</b> "We look at how much power you are pulling. If we can cover all your usage, we show exactly how much cheaper you can get the electricity."',
+        418,
+        388,
+        294,
+        SMALL,
+    )
+    c.setStrokeColor(ORANGE)
+    c.setLineWidth(3)
+    c.bezier(426, 305, 462, 342, 500, 262, 538, 305)
+    c.bezier(538, 305, 574, 342, 612, 262, 650, 305)
+    c.setFillColor(TEAL)
+    c.circle(426, 305, 5, stroke=0, fill=1)
+    c.circle(650, 305, 5, stroke=0, fill=1)
+    card(c, 50, 72, 692, 174, fill=NAVY, stroke=NAVY, radius=20, shadow=False)
+    c.setFillColor(ORANGE)
+    c.setFont("Helvetica-Bold", 15)
+    c.drawString(76, 210, "The bill pull script")
+    paragraph(
+        c,
+        '"Now do you get this online or on paper?"<br/><br/><b>If online:</b> "Perfect, pull up Duke for me real quick."<br/><b>If paper:</b> "Go grab it for me. I just need to see usage, not personal information."<br/><br/><b>Control:</b> stand calm, point to the section, and do not over-explain before the bill is in front of you.',
+        76,
+        188,
+        632,
+        BODY_WHITE,
+    )
+
+
+def team_page_walk_in(c):
+    background(c, 4)
+    title_block(c, "slide 04", "Walk-In Sit Flow", "If both homeowners are home and the bill shows enough usage, the best appointment is now.", 4)
+    steps = [
+        ("1", "Confirm value", '"If we can save you money, we will show exactly how much you can save."'),
+        ("2", "Compress time", '"It takes around 10 minutes." Do not make it sound like a long sales presentation.'),
+        ("3", "Ask for the sit", '"Do you mind if I step in?" Then stop talking and let them answer.'),
+        ("4", "Call the closer", "Once inside, call the closer. Give address, bill range, homeowner names, and any objection/pain."),
+    ]
+    y = 388
+    for num, title, body in steps:
+        card(c, 58, y - 54, 420, 58, fill=WHITE, radius=14, shadow=False)
+        c.setFillColor(ORANGE if num in ["3", "4"] else TEAL)
+        c.circle(84, y - 24, 17, stroke=0, fill=1)
+        c.setFillColor(NAVY if num in ["3", "4"] else WHITE)
+        c.setFont("Helvetica-Bold", 12)
+        c.drawCentredString(84, y - 29, num)
+        c.setFillColor(NAVY)
+        c.setFont("Helvetica-Bold", 11.5)
+        c.drawString(112, y - 13, title)
+        paragraph(c, body, 112, y - 27, 330, SMALL)
+        y -= 72
+    card(c, 510, 208, 210, 190, fill=NAVY, stroke=NAVY, radius=18, shadow=True)
+    c.setFillColor(ORANGE)
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(536, 358, "Closer handoff")
+    bullet_list(
+        c,
+        [
+            "Homeowner names",
+            "Address and gate notes",
+            "Bill amount / usage",
+            "Pain trigger: rate, storm, high bill, pool, family",
+            "Decision-makers present",
+            "Objection already heard",
+        ],
+        536,
+        330,
+        158,
+        TINY_WHITE,
+        ORANGE,
+        gap=5,
+    )
+    card(c, 510, 82, 210, 98, fill=WHITE, radius=16)
+    paragraph(c, "<b>Never wander inside without purpose.</b> Once seated, keep control: bill open, closer called, homeowner focused on savings.", 532, 146, 166, SMALL)
+
+
+def team_page_appointment(c):
+    background(c, 5)
+    title_block(c, "slide 05", "Appointment Flow: Missing Decision-Maker", "Only book later when the sit cannot happen now because a decision-maker is missing.", 5)
+    cards = [
+        ("Decision-maker check", '"Are you the only homeowner, or is it you and your husband/wife/partner?"'),
+        ("Together-time question", '"What time are you guys usually home together?" Then help them choose.'),
+        ("Option close", '"Is the afternoon or the morning better?" Then give two exact times.'),
+        ("Collect before leaving", "Bill picture, best phone number, exact address, good sit-down time, and all decision-maker names."),
+    ]
+    x_positions = [52, 410]
+    y_positions = [302, 138]
+    idx = 0
+    for y in y_positions:
+        for x in x_positions:
+            title, body = cards[idx]
+            card(c, x, y, 318, 128, fill=WHITE, radius=18)
+            c.setFillColor(TEAL if idx != 2 else ORANGE)
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(x + 22, y + 94, title)
+            paragraph(c, body, x + 22, y + 72, 270, BODY if idx < 3 else SMALL)
+            idx += 1
+    card(c, 58, 456, 676, 50, fill=NAVY, stroke=NAVY, radius=16, shadow=False)
+    paragraph(c, "<b>Appointment standard:</b> A future appointment is not real until the bill is captured, the phone number is verified, the exact time is locked, and both homeowners are committed.", 82, 489, 620, BODY_WHITE)
+    card(c, 58, 72, 676, 44, fill=ORANGE, stroke=ORANGE, radius=14, shadow=False)
+    paragraph(c, '<b>Lock line:</b> "Perfect, you are set for [day/time]. Both of you will be there, and I have the bill and number. If anything changes, text me back here."', 82, 100, 620, TINY_DARK)
+
+
+def team_page_qualification(c):
+    background(c, 6)
+    title_block(c, "slide 06", "Qualification: Do Not Set Junk", "The team wins when setters protect the closer's time and only push qualified opportunities.", 6)
+    quals = [
+        ("Homeowner", "Renters do not approve installs. Confirm owner status early."),
+        ("Duke bill / usage", "Need enough electric spend to create savings. Low $35-$40 bills are usually not worth the sit."),
+        ("Decision-makers", "Both homeowners present for a sit or locked for the appointment."),
+        ("Roof / shade", "Usable roof or property; heavy shade or bad roof requires expert review."),
+        ("Motivation", "Storm outage, rising rate, high bill, pool, large family, or frustration with Duke."),
+        ("Proof captured", "Bill photo/usage, phone, address, names, appointment time, notes."),
+    ]
+    x_positions = [52, 284, 516]
+    y_positions = [300, 136]
+    i = 0
+    for y in y_positions:
+        for x in x_positions:
+            title, body = quals[i]
+            card(c, x, y, 204, 126, fill=WHITE, radius=16)
+            c.setFillColor(ORANGE if i in [1, 2, 5] else TEAL)
+            c.circle(x + 28, y + 92, 14, stroke=0, fill=1)
+            c.setFillColor(NAVY)
+            c.setFont("Helvetica-Bold", 10.5)
+            c.drawString(x + 52, y + 94, title)
+            paragraph(c, body, x + 22, y + 68, 160, SMALL)
+            i += 1
+    card(c, 58, 456, 676, 50, fill=NAVY, stroke=NAVY, radius=16, shadow=False)
+    paragraph(c, '<b>Fast qualifier:</b> "You own the home, Duke is usually over about $100, and both homeowners can sit down for 10 minutes if the numbers make sense, right?"', 82, 489, 620, BODY_WHITE)
+
+
+def team_page_arc(c):
+    background(c, 7)
+    title_block(c, "slide 07", "Objection Handling: A.R.C.", "Acknowledge -> Respond -> Close/Continue. Make them feel heard, answer briefly, then move back to the bill or appointment.", 7)
+    arc = [
+        ("A", "Acknowledge", "Validate without agreeing away the sale. \"I hear you\" / \"That makes sense\" / \"Most people said the same thing.\""),
+        ("R", "Respond", "Give the smallest useful answer. Do not lecture solar, rates, or incentives at the door."),
+        ("C", "Close / Continue", "Ask the next controlling question: bill, homeowner status, sit, or two appointment times."),
+    ]
+    x = 58
+    for letter, title, body in arc:
+        card(c, x, 332, 210, 112, fill=WHITE, radius=18)
+        c.setFillColor(ORANGE if letter == "C" else TEAL)
+        c.circle(x + 30, 410, 22, stroke=0, fill=1)
+        c.setFillColor(NAVY if letter == "C" else WHITE)
+        c.setFont("Helvetica-Bold", 18)
+        c.drawCentredString(x + 30, 403, letter)
+        c.setFillColor(NAVY)
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(x + 64, 414, title)
+        paragraph(c, body, x + 24, 382, 160, TINY_DARK)
+        x += 232
+    examples = [
+        ("Not interested", "A: \"Totally fair.\" R: \"Most neighbors were not shopping solar either; they were just checking the Duke bill increase.\" C: \"What is your lowest Duke bill?\""),
+        ("I'm busy", "A: \"I get it, I am moving quick too.\" R: \"That is why I only need the bill first.\" C: \"Online or paper?\""),
+        ("Need spouse", "A: \"Perfect, they should be part of it.\" R: \"The numbers only matter if both of you see them.\" C: \"Morning or afternoon when you are both home?\""),
+        ("Leave info", "A: \"I can.\" R: \"The info is useless until we know your usage.\" C: \"Pull up the Duke bill and I will tell you if it is even worth it.\""),
+    ]
+    y = 270
+    for title, body in examples:
+        card(c, 70, y - 43, 652, 48, fill=WHITE, radius=12, shadow=False)
+        c.setFillColor(TEAL)
+        c.setFont("Helvetica-Bold", 9.8)
+        c.drawString(90, y - 10, title)
+        paragraph(c, body, 180, y - 7, 516, TINY_DARK)
+        y -= 57
+    card(c, 70, 54, 652, 44, fill=NAVY, stroke=NAVY, radius=14, shadow=False)
+    paragraph(c, "<b>Rule:</b> one A.R.C. loop, then re-ask. If they still resist, exit clean and keep your pace.", 94, 82, 604, BODY_WHITE)
+
+
+def team_page_tonality(c):
+    background(c, 8)
+    title_block(c, "slide 08", "Tonality, Posture, and Control", "A direct pitch only works when the rep looks calm, local, and certain.", 8)
+    card(c, 48, 94, 700, 360, fill=WHITE, radius=22)
+    draw_solar_home(c, 70, 256, 220, 145)
+    c.setStrokeColor(TEAL)
+    c.setLineWidth(2)
+    c.line(286, 284, 444, 284)
+    c.setFillColor(TEAL)
+    c.circle(444, 284, 5, stroke=0, fill=1)
+    c.setFillColor(NAVY)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(310, 302, "4-6 feet from the door")
+    c.setFont("Helvetica", 8.5)
+    c.setFillColor(SLATE)
+    c.drawString(310, 268, "Point at power lines; do not crowd the homeowner.")
+    sections = [
+        ("Powerline opener", ["Short and urgent.", "Point, pause, let them look.", "Get the micro-agreement."]),
+        ("Bill pain", ["Slow down on $48/month.", "Pause after their bill amount.", "Ask why it is so high."]),
+        ("Close", ["Assume the next step.", "Use online/paper choice.", "Ask to step in if both are home."]),
+    ]
+    x = 316
+    for title, items in sections:
+        card(c, x, 114, 128, 126, fill=colors.HexColor("#F3FAFF"), radius=14, shadow=False)
+        c.setFillColor(ORANGE)
+        c.setFont("Helvetica-Bold", 9.8)
+        c.drawString(x + 13, 214, title)
+        bullet_list(c, items, x + 13, 194, 100, TINY_DARK, TEAL, gap=5)
+        x += 138
+    card(c, 72, 112, 210, 102, fill=NAVY, stroke=NAVY, radius=16, shadow=False)
+    paragraph(c, "<b>Control phrase:</b><br/>\"I might not even be able to help here. I just need to see if the usage makes sense. Online or paper?\"", 92, 180, 170, BODY_WHITE)
+
+
+def team_page_followup(c):
+    background(c, 9)
+    title_block(c, "slide 09", "Confirmation + Follow-Up", "A set is not a set until the homeowner has replied, the bill is captured, and the closer has clean notes.", 9)
+    icon_phone(c, 58, 345, 62)
+    cadence = [
+        ("At the door", "Text confirmation while standing there. Ask them to reply yes."),
+        ("CRM immediately", "Bill amount, usage note, names, objection, roof note, and sit/appointment status."),
+        ("Morning of", "Reminder with exact time and \"have Duke bill ready\" prompt."),
+        ("30-60 min before", "Final confirmation. If shaky, resell the reason: $48 increase, usage review, 10 minutes."),
+        ("No-show", "Reschedule within 10 minutes using two options; follow up next day."),
+    ]
+    x0 = 150
+    y = 412
+    for idx, (title, body) in enumerate(cadence):
+        if idx < len(cadence) - 1:
+            c.setStrokeColor(TEAL)
+            c.setLineWidth(3)
+            c.line(x0 + 14, y - 20, x0 + 14, y - 66)
+        c.setFillColor(ORANGE if idx == 0 else TEAL)
+        c.circle(x0 + 14, y - 8, 14, stroke=0, fill=1)
+        c.setFillColor(NAVY if idx == 0 else WHITE)
+        c.setFont("Helvetica-Bold", 8.5)
+        c.drawCentredString(x0 + 14, y - 12, str(idx + 1))
+        card(c, x0 + 42, y - 42, 538, 44, fill=WHITE, radius=12, shadow=False)
+        c.setFillColor(NAVY)
+        c.setFont("Helvetica-Bold", 10.5)
+        c.drawString(x0 + 58, y - 15, title)
+        paragraph(c, body, x0 + 176, y - 12, 382, TINY_DARK)
+        y -= 66
+    card(c, 58, 64, 664, 48, fill=NAVY, stroke=NAVY, radius=14, shadow=False)
+    paragraph(c, '<b>Confirmation text:</b> "You are set for [time] with [closer]. Both homeowners there, Duke bill ready. Reply YES so I know this is locked."', 82, 96, 610, BODY_WHITE)
+
+
+def team_page_standards(c):
+    background(c, 10, dark=True)
+    title_block(c, "slide 10", "Daily Team Standards", "Clear standards create clean accountability: morning preparation, field volume, sits, sales, and strikes.", 10, dark=True)
+    metrics = [
+        ("9:30am", "morning meeting: roleplay, objections, territory, assignments"),
+        ("80", "minimum doors knocked"),
+        ("2 sits", "daily setter target"),
+        ("1 sale", "alternate daily target"),
+        ("strike", "issued when standard is missed without approval"),
+    ]
+    x = 48
+    widths = [160, 118, 118, 118, 140]
+    for i, (num, label) in enumerate(metrics):
+        compact_metric(c, x, 378, widths[i], num, label, ORANGE if i in [0, 4] else TEAL)
+        x += widths[i] + 14
+    c.setFillColor(ICE)
+    c.setFont("Helvetica-Bold", 15)
+    c.drawString(64, 330, "Operating rhythm")
+    rhythm = [
+        ("Morning", "9:30am meeting; script reps; A.R.C. objection drills; territory plan."),
+        ("Field block", "80 doors minimum. Track contacts, bill pulls, sits, appointments, sales."),
+        ("Evening", "Confirmation texts, no-show recovery, CRM cleanup, scorecard review."),
+    ]
+    y = 282
+    for title, body in rhythm:
+        card(c, 64, y - 44, 312, 50, fill=hex_alpha("#FFFFFF", 0.08), stroke=hex_alpha("#FFFFFF", 0.18), radius=13, shadow=False)
+        c.setFillColor(ORANGE)
+        c.setFont("Helvetica-Bold", 10.5)
+        c.drawString(84, y - 12, title)
+        paragraph(c, body, 154, y - 10, 190, TINY_WHITE)
+        y -= 62
+    card(c, 416, 136, 306, 190, fill=ORANGE, stroke=ORANGE, radius=18, shadow=True)
+    paragraph(
+        c,
+        "<b>Scorecard chain</b><br/><br/>Doors -> Conversations -> Bill pulls -> Walk-in sits -> Appointments -> Shows -> Sales<br/><br/>Improve the weakest conversion step first. If doors are high but bill pulls are low, the pain build or bill ask needs roleplay.",
+        444,
+        288,
+        250,
+        style("Scorecard", 11, 14, NAVY, "Helvetica-Bold"),
+    )
+
+
+def team_page_recovery(c):
+    background(c, 11)
+    title_block(c, "slide 11", "Rejection Recovery + Coaching Loop", "The team standard is speed of reset and honesty of feedback.", 11)
+    steps = [
+        ("Reset", "Exhale, relax face, stand tall, next door. Never carry one homeowner's energy to the next."),
+        ("Diagnose", "Which step broke: powerline opener, micro-agreement, bill pain, bill pull, sit ask, or appointment lock?"),
+        ("Drill", "Bring the exact moment to the 9:30am meeting or end-of-day roleplay. Fix the line, then retest."),
+    ]
+    x = 62
+    for i, (title, body) in enumerate(steps):
+        card(c, x, 286, 202, 138, fill=WHITE, radius=18)
+        c.setFillColor([TEAL, ORANGE, RED][i])
+        c.circle(x + 32, 388, 22, stroke=0, fill=1)
+        c.setFillColor(WHITE if i != 1 else NAVY)
+        c.setFont("Helvetica-Bold", 15)
+        c.drawCentredString(x + 32, 383, str(i + 1))
+        c.setFillColor(NAVY)
+        c.setFont("Helvetica-Bold", 13)
+        c.drawString(x + 68, 392, title)
+        paragraph(c, body, x + 24, 350, 154, SMALL)
+        x += 226
+    card(c, 70, 112, 652, 126, fill=NAVY, stroke=NAVY, radius=18, shadow=False)
+    paragraph(
+        c,
+        "<b>Post-door review questions</b><br/>1. Did I point at a real local visual? 2. Did I get the micro-agreement? 3. Did I make the Duke bill increase feel personal? 4. Did I ask for the bill directly? 5. Did I ask to step in or lock both homeowners?",
+        98,
+        202,
+        596,
+        BODY_WHITE,
+    )
+
+
+def team_page_solar_context(c):
+    background(c, 12, dark=True)
+    title_block(c, "slide 12", "Solar Context + Field Guardrails", "Know enough to guide the conversation, but keep the door pitch focused on qualification and next step.", 12, dark=True)
+    topics = [
+        ("Usage drives savings", "Solar economics start with electricity usage, local rates, utility policy, and system size. That is why the bill matters."),
+        ("Roof matters", "South/east/west exposure, shade, roof age, and roof condition affect what can be designed."),
+        ("Do not overpromise", "Do not quote guaranteed savings, incentives, or backup power claims at the door. The closer reviews details."),
+        ("Local claims", "Powerline, outage, and Duke rate-increase statements must match the territory's verified facts."),
+    ]
+    x_positions = [58, 400]
+    y_positions = [300, 136]
+    i = 0
+    for y in y_positions:
+        for x in x_positions:
+            title, body = topics[i]
+            card(c, x, y, 312, 128, fill=hex_alpha("#FFFFFF", 0.08), stroke=hex_alpha("#FFFFFF", 0.18), radius=18, shadow=False)
+            c.setFillColor(ORANGE if i >= 2 else TEAL)
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(x + 22, y + 94, title)
+            paragraph(c, body, x + 22, y + 70, 266, SMALL_WHITE)
+            i += 1
+    card(c, 58, 456, 674, 50, fill=ORANGE, stroke=ORANGE, radius=16, shadow=False)
+    paragraph(c, "<b>Final standard:</b> Create urgency with truth, qualify with discipline, and protect the closer's calendar.", 82, 489, 620, style("FinalTeam", 12, 15, NAVY, "Helvetica-Bold"))
+    c.setFont("Helvetica", 7)
+    c.setFillColor(hex_alpha("#FFFFFF", 0.78))
+    c.drawString(64, 52, "A.R.C. framework synthesized from common sales training references: Acknowledge, Respond, Close/Continue. Solar context synthesized from DOE homeowner solar guidance and residential solar qualification best practices.")
+
+
 def generate_pdf():
     assets = prepare_assets()
     c = canvas.Canvas(str(OUT_PDF), pagesize=landscape(letter))
-    c.setTitle("Solar Appointment Setter - High-Performance Field Card Deck")
+    c.setTitle("Solar Appointment Setter - Team Field Card Deck")
     c.setAuthor("Cursor Cloud Agent")
-    c.setSubject("Redesigned solar appointment setter field training deck")
+    c.setSubject("Team-specific solar appointment setter training deck")
     pages = [
-        lambda: page_cover(c, assets),
-        lambda: page_script(c, assets),
-        lambda: page_body_language(c),
-        lambda: page_qualification(c, assets),
-        lambda: page_solar_101(c),
-        lambda: page_objections(c),
-        lambda: page_lock_in(c, assets),
-        lambda: page_follow_up(c),
-        lambda: page_rejection(c),
-        lambda: page_standards(c),
+        lambda: team_page_cover(c, assets),
+        lambda: team_page_pitch(c, assets),
+        lambda: team_page_pain_bill(c),
+        lambda: team_page_walk_in(c),
+        lambda: team_page_appointment(c),
+        lambda: team_page_qualification(c),
+        lambda: team_page_arc(c),
+        lambda: team_page_tonality(c),
+        lambda: team_page_followup(c),
+        lambda: team_page_standards(c),
+        lambda: team_page_recovery(c),
+        lambda: team_page_solar_context(c),
     ]
     for idx, page in enumerate(pages):
         page()

@@ -4,11 +4,11 @@ import { defaultCriteria, gradePitch } from "./grading";
 describe("gradePitch", () => {
   it("scores keyword coverage across weighted criteria", () => {
     const result = gradePitch(
-      "Today we will set an agenda, understand your challenge, discuss budget and timeline, show ROI, handle any concern, and schedule the next step.",
+      "Today we will set an agenda to understand your goal and help with the challenge and pain. What budget, timeline, decision process, and priority matter most? This can save time, increase ROI, reduce risk, and deliver a clear benefit because it fits your team. I understand the concern; however, the value is stronger when we schedule the next step and follow up with a proposal.",
       defaultCriteria,
     );
 
-    expect(result.overallPercentage).toBeGreaterThan(45);
+    expect(result.overallPercentage).toBeGreaterThan(80);
     expect(result.criterionScores).toHaveLength(defaultCriteria.length);
     expect(result.criterionScores[0].matchedKeywords).toContain("agenda");
   });

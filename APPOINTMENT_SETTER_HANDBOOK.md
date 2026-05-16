@@ -98,23 +98,6 @@ This line creates a pressure release. Homeowners are used to salespeople asking 
 ### The psychological effect
 The homeowner's guard drops because the conversation feels less like a pitch and more like a quick update. It also creates curiosity. They are more likely to listen because you are not immediately asking them for attention, money, or commitment.
 
-### How to say it
-Say it casually, like you are catching them for a quick second.
-
-Good:
-- Calm
-- Brief
-- Normal volume
-- Slightly conversational
-
-Avoid:
-- Too loud
-- Too excited
-- Too fast
-- Too rehearsed
-
-If it sounds like a line, it loses power. If it sounds like a natural opener, it works.
-
 ### Why the powerline question works
 "Do you see these powerlines here?" gives the homeowner something simple to respond to. They do not have to decide anything. They only have to look and acknowledge.
 
@@ -166,23 +149,6 @@ The strongest emotional trigger is not "the program is great." The stronger trig
 
 > "I am already paying more, and I do not like where this is going."
 
-### How to say it
-Use a grounded, matter-of-fact tone.
-
-Good tone:
-- Serious
-- Calm
-- Practical
-- Slightly empathetic
-
-Avoid this tone:
-- Angry
-- Dramatic
-- Conspiracy-like
-- Fear-based
-
-Do not sound like you are attacking Duke. The goal is not to rant. The goal is to help the homeowner recognize the financial problem.
-
 ### How to make it human
 After the problem line, watch their face. If they react, do not bulldoze into the next line.
 
@@ -216,23 +182,6 @@ The most important word is **if**.
 The homeowner becomes curious without feeling cornered. They do not have to agree to panels or a program at the door. They only have to be open to seeing whether the numbers make sense.
 
 That is a much easier commitment.
-
-### How to say it
-Slow down slightly here. This line has more weight than the Intro.
-
-Good delivery:
-- Clear
-- Controlled
-- Confident
-- Measured
-
-Avoid this delivery:
-- Overhyped
-- Too fast
-- Too technical
-- Too much emphasis on "cheaper"
-
-If you overplay the savings, the homeowner becomes skeptical. If you say it calmly, it sounds more credible.
 
 ### Professional wording notes
 Avoid phrases that sound exaggerated:
@@ -291,21 +240,6 @@ It tells the homeowner:
 
 People naturally want to know which category they are in. The Take Away makes the homeowner more willing to answer the bill question.
 
-### How to say it
-Say it neutrally. Do not sound arrogant. Do not sound dismissive.
-
-Good:
-- Calm
-- Casual
-- Honest
-- Matter-of-fact
-
-Avoid:
-- Condescending
-- Sarcastic
-- Challenging
-- Like you are trying to manipulate them
-
 ### Why this makes you sound professional
 Professionals are willing to say when something is not a fit. Amateurs try to force every conversation.
 
@@ -335,23 +269,6 @@ Asking for the lowest bill feels less invasive than immediately asking for the h
 Once the homeowner says their number out loud, the conversation becomes personal. They are no longer talking about "rates" in general. They are talking about their own monthly payment.
 
 That is where the appointment begins to become relevant.
-
-### How to say it
-Ask with calm curiosity.
-
-Good:
-- Neutral
-- Curious
-- Relaxed
-- Non-judgmental
-
-Avoid:
-- Interrogating
-- Too excited
-- Surprised in a fake way
-- Judging the number
-
-If they give a high number, do not explode with excitement. Stay composed.
 
 Example:
 
@@ -491,19 +408,7 @@ Body language tells the homeowner whether you are safe, confident, and worth lis
 ## Positioning
 Stand one half-step back after knocking. This gives the homeowner space and reduces the feeling of pressure.
 
-Good positioning:
-- Feet stable
-- Body slightly angled
-- Shoulders relaxed
-- Hands visible
-- Tablet or folder held low
-
-Avoid this positioning:
-- Leaning into the doorway
-- Standing too close
-- Blocking the exit path
-- Squaring up like a confrontation
-- Looking around the property too much
+Keep your feet stable, body slightly angled, shoulders relaxed, and hands visible. Hold your tablet or folder low so it does not become a barrier between you and the homeowner. Do not lean into the doorway, stand too close, or square up like a confrontation.
 
 Why this matters:
 The doorway is the homeowner's personal space. If you crowd that space, their guard goes up. If you respect that space, they are more likely to hear you.
@@ -511,16 +416,7 @@ The doorway is the homeowner's personal space. If you crowd that space, their gu
 ## Eye contact
 Hold eye contact long enough to show confidence, but not so much that it feels intense.
 
-Good eye contact:
-- Look at them when asking a question.
-- Look briefly toward the local anchor when pointing.
-- Return to them after they respond.
-
-Avoid this eye contact:
-- Staring
-- Looking down the whole time
-- Looking past them into the house
-- Scanning the property while talking
+Look at them when asking a question, glance briefly toward the local anchor when pointing, then return your attention to them after they respond. Do not stare, look down the whole time, look past them into the house, or scan the property while talking.
 
 Why this matters:
 Eye contact communicates honesty. Too little looks weak. Too much feels aggressive.
@@ -528,16 +424,7 @@ Eye contact communicates honesty. Too little looks weak. Too much feels aggressi
 ## Hands and gestures
 Use small, purposeful gestures.
 
-Good gestures:
-- Point lightly at the powerlines.
-- Open palm when explaining.
-- Still hands when asking the bill question.
-
-Avoid these gestures:
-- Big waving motions
-- Fidgeting with badge, tablet, or pen
-- Pointing at the homeowner
-- Crossing arms
+Point lightly at the powerlines, use an open palm when explaining, and keep your hands still when asking the bill question. Big gestures, fidgeting, pointing at the homeowner, or crossing your arms can make the interaction feel tense or unprofessional.
 
 Why this matters:
 Fast or excessive movement makes you look nervous. Controlled movement makes you look professional.
@@ -604,21 +491,7 @@ Diction is word choice and clarity. Better diction makes you sound more professi
 ## Speak in plain language
 Homeowners do not need technical program language at the door. They need a clear reason to continue.
 
-Use:
-- "Power you're already using"
-- "Paying less"
-- "Your actual bill"
-- "See if it makes sense"
-- "Show you exactly what it looks like"
-
-Avoid:
-- "Photovoltaic system"
-- "Net metering structure"
-- "Offset percentage"
-- "Federal incentive stack"
-- "Energy consultation"
-
-Technical terms can come later. At the door, clarity wins.
+Use plain bill language: the power they already use, what they already pay, and whether the numbers make sense. Technical terms can come later. At the door, clarity wins.
 
 ## Remove filler words
 Too many filler words make you sound unsure.
@@ -636,19 +509,7 @@ You do not need to sound perfect. You need to sound clear.
 ## Use confident but honest language
 Professional setters do not overpromise.
 
-Better:
-- "If the numbers make sense..."
-- "If your usage qualifies..."
-- "We will show you exactly what it looks like."
-- "If it does not help, we will tell you."
-
-Worse:
-- "This will definitely save you money."
-- "Everyone qualifies."
-- "There is no downside."
-- "You have to do this."
-
-Honest diction builds trust.
+Language like "if the numbers make sense," "if your usage qualifies," and "if it does not help, we will tell you" builds trust because it sounds measured and honest. Hard promises, guaranteed savings, or pressure language make the homeowner skeptical.
 
 ## Use homeowner language
 Mirror simple words the homeowner uses.
@@ -717,20 +578,7 @@ Each step is small. Together, they move the homeowner from guarded to engaged.
 ## Keep control through questions
 The person asking good questions controls the direction of the conversation.
 
-Use:
-- "Real quick..."
-- "Out of curiosity..."
-- "So I can see if this even makes sense..."
-- "Before I waste your time..."
-- "What does it usually hit in the summer?"
-
-Avoid:
-- "Are you interested in this?"
-- "What do you think?"
-- "Do you want to sign up?"
-- "When are you free?"
-
-The wrong question gives away control. The right question moves the pitch forward.
+Use short transitions like "real quick," "out of curiosity," "so I can see if this even makes sense," and "before I waste your time." The wrong question gives away control. The right question moves the pitch forward.
 
 ---
 

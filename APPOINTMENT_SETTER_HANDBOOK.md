@@ -707,33 +707,7 @@ Measure execution, not emotion.
 
 ---
 
-## 24) Leadership Expectations and Accountability
-
-Leaders inspect what they expect.
-
-## Daily tracking scoreboard
-- Doors knocked
-- Meaningful conversations
-- Bill pulls
-- Sits set
-- Sits run
-- Sales
-- No-show rate
-
-## Accountability cadence
-- **Morning:** target declaration.
-- **Midday:** pace check.
-- **End of day:** scoreboard review and top 2 lessons.
-
-## Leadership standards
-- Coach behaviors, not just outcomes.
-- Correct in real time.
-- Require roleplay proof, not verbal confidence.
-- Protect culture from excuse loops.
-
----
-
-## 25) One-Page Field Cheat Sheet
+## 24) One-Page Field Cheat Sheet
 
 ## Door script skeleton
 1. Time release: "I don't have much time."
@@ -757,7 +731,7 @@ Leaders inspect what they expect.
 
 ---
 
-## 26) Final Standard
+## 25) Final Standard
 
 Do not wing it and do not recite like a robot.
 

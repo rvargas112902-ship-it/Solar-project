@@ -1,5 +1,5 @@
 # Elite Appointment Setter Pitch Booklet
-## Door-to-Door Solar Pitch Execution Guide
+## Door-to-Door Savings and Net Metering Pitch Execution Guide
 
 ---
 
@@ -66,6 +66,10 @@ Use this pitch as the foundation:
 ### Close
 "What's the lowest your Duke bill gets?"
 
+"If I can't even save you money and it ends up costing more, what are you going to tell me?"
+
+"What I look at is the squiggly line on your bill. It tells me how much power you are pulling annually and lets me know if I can save you money. Do you get this online or paper?"
+
 This is not meant to sound robotic. The structure should stay the same, but the delivery should feel like a real person talking to another real person.
 
 ---
@@ -80,7 +84,7 @@ This is not meant to sound robotic. The structure should stay the same, but the 
 "They are all going underground because most people lost power during the storms. That way if something catastrophic happens, we'll still have power. Does that make sense?"
 
 ### What the Intro is supposed to do
-The Intro is not where you sell solar. The Intro is where you earn the right to keep talking.
+The Intro is not where you explain panels, equipment, or programs. The Intro is where you earn the right to keep talking.
 
 Most homeowners expect a door knocker to take too long, talk too much, and ask for something too soon. The Intro breaks that pattern.
 
@@ -103,7 +107,7 @@ Good:
 - Normal volume
 - Slightly conversational
 
-Bad:
+Avoid:
 - Too loud
 - Too excited
 - Too fast
@@ -158,7 +162,7 @@ The key is to make the problem feel simple:
 ### The psychological effect
 This creates shared frustration. You are no longer just a person at the door. You are pointing out something the homeowner may already feel but has not fully connected.
 
-The strongest emotional trigger is not "solar is great." The stronger trigger is:
+The strongest emotional trigger is not "the program is great." The stronger trigger is:
 
 > "I am already paying more, and I do not like where this is going."
 
@@ -171,7 +175,7 @@ Good tone:
 - Practical
 - Slightly empathetic
 
-Bad tone:
+Avoid this tone:
 - Angry
 - Dramatic
 - Conspiracy-like
@@ -209,7 +213,7 @@ The most important word is **if**.
 - The next step is simply to see the numbers.
 
 ### The psychological effect
-The homeowner becomes curious without feeling cornered. They do not have to agree to solar. They only have to be open to seeing whether the numbers make sense.
+The homeowner becomes curious without feeling cornered. They do not have to agree to panels or a program at the door. They only have to be open to seeing whether the numbers make sense.
 
 That is a much easier commitment.
 
@@ -222,7 +226,7 @@ Good delivery:
 - Confident
 - Measured
 
-Bad delivery:
+Avoid this delivery:
 - Overhyped
 - Too fast
 - Too technical
@@ -244,6 +248,17 @@ Use professional fit-check language:
 - "If it does not help, we will tell you."
 
 Professional language creates trust because it sounds measured and honest.
+
+### Pitch savings and net metering, not equipment
+At the door, the Solution is not a technical explanation of panels. The Solution is the possibility of using net metering to turn their current power usage into a lower, more predictable payment.
+
+Keep the language focused on:
+- Saving money
+- Using their actual annual power usage
+- Comparing against what they already pay Duke
+- Seeing whether net metering makes financial sense
+
+Do not make the homeowner feel like they are being asked to buy equipment at the door. Make them feel like they are checking whether their bill can be lowered.
 
 ---
 
@@ -285,7 +300,7 @@ Good:
 - Honest
 - Matter-of-fact
 
-Bad:
+Avoid:
 - Condescending
 - Sarcastic
 - Challenging
@@ -330,7 +345,7 @@ Good:
 - Relaxed
 - Non-judgmental
 
-Bad:
+Avoid:
 - Interrogating
 - Too excited
 - Surprised in a fake way
@@ -371,6 +386,14 @@ Setter: "Exactly, a lot of people around here did. The frustrating part is Duke 
 Homeowner: "Yeah, our bill has definitely gone up."
 
 Setter: "That's why I stopped. If we can get you the power you're already using from Duke for significantly cheaper, we'll show you exactly what it looks like. Most neighbors are only paying $35-$40, so we probably can't help them. What's the lowest your Duke bill gets?"
+
+Homeowner: "$180 on the low end."
+
+Setter: "Got it. And if I can't even save you money and it ends up costing more, what are you going to tell me?"
+
+Homeowner: "No."
+
+Setter: "Exactly. What I look at is the squiggly line on your bill. It tells me how much power you are pulling annually and lets me know if I can save you money. Do you get this online or paper?"
 
 ### What makes the second version better
 - The setter pauses.
@@ -457,38 +480,6 @@ What it sounds like:
 - Clear
 - Not forceful
 
-## Bad tones and why they hurt you
-
-### Too excited
-Why it hurts:
-- Sounds like you need the sale.
-- Makes the homeowner suspicious.
-- Turns a professional conversation into a sales performance.
-
-### Too fast
-Why it hurts:
-- Sounds memorized.
-- Gives the homeowner no time to process.
-- Makes them feel like you are trying to push past their judgment.
-
-### Too soft
-Why it hurts:
-- Sounds unsure.
-- Makes you harder to hear.
-- Forces the homeowner to lead the interaction.
-
-### Too aggressive
-Why it hurts:
-- Triggers defensiveness.
-- Makes the homeowner want to end the conversation.
-- Destroys trust before you qualify.
-
-### Too monotone
-Why it hurts:
-- Sounds robotic.
-- Makes the pitch feel memorized.
-- Prevents emotional connection.
-
 The best tone is controlled, clear, and human.
 
 ---
@@ -507,7 +498,7 @@ Good positioning:
 - Hands visible
 - Tablet or folder held low
 
-Bad positioning:
+Avoid this positioning:
 - Leaning into the doorway
 - Standing too close
 - Blocking the exit path
@@ -525,7 +516,7 @@ Good eye contact:
 - Look briefly toward the local anchor when pointing.
 - Return to them after they respond.
 
-Bad eye contact:
+Avoid this eye contact:
 - Staring
 - Looking down the whole time
 - Looking past them into the house
@@ -542,7 +533,7 @@ Good gestures:
 - Open palm when explaining.
 - Still hands when asking the bill question.
 
-Bad gestures:
+Avoid these gestures:
 - Big waving motions
 - Fidgeting with badge, tablet, or pen
 - Pointing at the homeowner
@@ -611,7 +602,7 @@ Control your pace and the conversation feels controlled.
 Diction is word choice and clarity. Better diction makes you sound more professional without sounding stiff.
 
 ## Speak in plain language
-Homeowners do not need technical solar language at the door. They need a clear reason to continue.
+Homeowners do not need technical program language at the door. They need a clear reason to continue.
 
 Use:
 - "Power you're already using"
@@ -734,7 +725,7 @@ Use:
 - "What does it usually hit in the summer?"
 
 Avoid:
-- "Are you interested in solar?"
+- "Are you interested in this?"
 - "What do you think?"
 - "Do you want to sign up?"
 - "When are you free?"
@@ -752,14 +743,29 @@ Pain-building means helping the homeowner clearly understand the cost problem th
 2. "And what does it spike to in the summer?"
 3. "How long has it been hitting that range?"
 4. "Is it the summer spike or the constant increase that bothers you more?"
-5. "If that payment could be lower and more predictable, would it be worth seeing the numbers?"
+5. "If I can't even save you money and it ends up costing more, what are you going to tell me?"
+6. "What I look at is the squiggly line on your bill. It tells me how much power you are pulling annually and lets me know if I can save you money. Do you get this online or paper?"
 
 ## Why this sequence works
 - The lowest bill starts the conversation safely.
 - The summer bill reveals the pain.
 - The timeline shows whether the problem is persistent.
 - The frustration question identifies emotional motivation.
-- The final question turns pain into a next step.
+- The savings question removes pressure because the obvious answer is no.
+- The squiggly-line explanation gives a simple reason for pulling the bill without getting technical.
+
+## Why the squiggly line matters
+The usage graph on the bill shows how much power the home pulls across the year. That annual usage is what tells you whether net metering can create savings.
+
+Keep this explanation simple. The homeowner does not need a technical lesson at the door. They need to understand why the bill matters:
+
+> "This tells me what you are already using and whether I can beat what you are already paying."
+
+Then ask:
+
+> "Do you get this online or paper?"
+
+That question gives them a simple action instead of a vague decision.
 
 ## How to respond to bill numbers
 If the number is low:
@@ -783,6 +789,21 @@ The appointment should feel like the natural next step, not a sudden ask.
 Use a clear transition:
 
 "Based on that bill range, it is worth having someone map this to your actual usage. It is just a numbers walkthrough to see if it saves money."
+
+## Bill-pull transition
+"If I can't even save you money and it ends up costing more, what are you going to tell me?"
+
+Let them answer. The answer should be some version of "no."
+
+Then say:
+
+"Exactly. What I look at is the squiggly line on your bill. It tells me how much power you are pulling annually and lets me know if I can save you money. Do you get this online or paper?"
+
+Why this works:
+- It makes the homeowner feel in control.
+- It proves you are not asking them to move forward if the numbers are worse.
+- It explains why you need the bill in plain language.
+- It turns the bill pull into a simple online-or-paper question.
 
 ## If both homeowners are available
 "If you both are here now, we can take 10-15 minutes and show you what it looks like against your actual usage."
@@ -820,7 +841,7 @@ Use this structure:
 3. **Move forward** - Ask a small question that continues the pitch.
 
 ## "Not interested."
-"Totally fair. Most people are not interested in solar. They are interested in seeing if Duke can be beaten on price. Real quick, are your bills usually under $50 or over $150?"
+"Totally fair. Most people are not interested in another pitch. They are interested in seeing if net metering can beat Duke on price. Real quick, are your bills usually under $50 or over $150?"
 
 ## "I don't have time."
 "Same here. That is why I started with 'I don't have much time.' Before I run, what does your bill usually get to in the summer?"
@@ -828,8 +849,8 @@ Use this structure:
 ## "I need to talk to my spouse."
 "Exactly, and that is why we only do the walkthrough when both people are there. Is tomorrow at 5:45 or 6:30 better?"
 
-## "I heard solar is a scam."
-"You are right to be cautious. That is why we do not guess. We use your actual Duke bill and show transparent numbers first. Are you at least open to seeing if the home even qualifies?"
+## "I heard this is a scam."
+"You are right to be cautious. That is why we do not guess. We use your actual Duke bill and compare the net metering numbers first. If I can't save you money, you would tell me no anyway. Do you get your bill online or paper?"
 
 ## "My bill is already low."
 "That may mean you are already in the group where this does not make sense. What does it usually hit at the highest point?"
@@ -839,51 +860,7 @@ When handling objections, do not speed up. Slow down slightly. If you rush, you 
 
 ---
 
-## 19) Practice Drills That Improve the Pitch
-
-These drills are included because they improve delivery, timing, and confidence in the actual pitch.
-
-## Drill 1: Structure recall
-Say the five parts without the script:
-1. Intro
-2. Problem
-3. Solution
-4. Take Away
-5. Close
-
-Then explain what each part is supposed to accomplish.
-
-## Drill 2: Tone contrast
-Say the same line three ways:
-
-"What's the lowest your Duke bill gets?"
-
-1. Too excited
-2. Too aggressive
-3. Calm and curious
-
-The goal is to feel how the wrong tone changes the meaning.
-
-## Drill 3: Pause control
-Practice pausing after:
-- "Does that make sense?"
-- "Paying more for the same amount of power."
-- "What's the lowest your Duke bill gets?"
-
-The goal is to stop rushing through the moments that need homeowner participation.
-
-## Drill 4: Human response reps
-Have a partner interrupt the pitch with realistic comments:
-- "We lost power for two days."
-- "Duke is ridiculous."
-- "I'm not interested."
-- "My spouse handles that."
-
-Respond naturally, then return to the structure.
-
----
-
-## 20) Common Mistakes and Corrections
+## 19) Common Mistakes and Corrections
 
 ## Mistake: Reciting the words without listening
 Correction: Acknowledge the homeowner before moving to the next line.
@@ -908,7 +885,7 @@ Correction: Speak in bill language first. Technical details come later.
 
 ---
 
-## 21) One-Page Pitch Cheat Sheet
+## 20) One-Page Pitch Cheat Sheet
 
 ## Structure
 1. **Intro:** Lower guard and create local relevance.
@@ -933,6 +910,12 @@ Take Away:
 Close:
 "What's the lowest your Duke bill gets?"
 
+Savings check:
+"If I can't even save you money and it ends up costing more, what are you going to tell me?"
+
+Bill pull:
+"What I look at is the squiggly line on your bill. It tells me how much power you are pulling annually and lets me know if I can save you money. Do you get this online or paper?"
+
 ## Delivery checklist
 - [ ] Stand back from the door.
 - [ ] Speak at normal volume.
@@ -942,11 +925,13 @@ Close:
 - [ ] Acknowledge homeowner responses.
 - [ ] Avoid technical language too early.
 - [ ] Ask the bill question with calm curiosity.
+- [ ] Explain the squiggly line as annual usage, not technical equipment.
+- [ ] Keep the door conversation focused on savings and net metering.
 - [ ] Use time-option closes for appointments.
 
 ---
 
-## 22) Final Standard
+## 21) Final Standard
 
 The best appointment setters do not sound like they are repeating words. They sound like professionals who understand the homeowner, understand the problem, and know how to guide the next step.
 

@@ -497,14 +497,22 @@ def add_content_slide(
     if right_chunk is None:
         body = slide.shapes.add_textbox(Inches(1.08), Inches(1.45), Inches(10.8), Inches(4.95))
         font_size = choose_safe_font(
-            [left_chunk], width_in=10.8, height_in=4.95, candidates=[15, 14, 13, 12, 11]
+            [left_chunk],
+            width_in=10.8,
+            height_in=4.95,
+            candidates=[15, 14, 13, 12, 11],
+            safety_ratio=0.9,
         )
         _render_text_lines(body.text_frame, left_chunk, body_font_size=font_size)
     else:
         left_box = slide.shapes.add_textbox(Inches(1.05), Inches(1.45), Inches(5.2), Inches(4.95))
         right_box = slide.shapes.add_textbox(Inches(6.4), Inches(1.45), Inches(5.2), Inches(4.95))
         font_size = choose_safe_font(
-            [left_chunk, right_chunk], width_in=5.2, height_in=4.95, candidates=[14, 13, 12, 11, 10]
+            [left_chunk, right_chunk],
+            width_in=5.2,
+            height_in=4.95,
+            candidates=[14, 13, 12, 11, 10],
+            safety_ratio=0.9,
         )
 
         _render_text_lines(left_box.text_frame, left_chunk, body_font_size=font_size)

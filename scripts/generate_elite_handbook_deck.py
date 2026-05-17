@@ -34,6 +34,8 @@ PALETTE = {
     "muted": RGBColor(164, 180, 210),
 }
 
+TEXT_SHIFT_INCHES = 0.12
+
 
 def clean_inline_markdown(text: str) -> str:
     text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
@@ -41,10 +43,13 @@ def clean_inline_markdown(text: str) -> str:
     return text.strip()
 
 
-def clean_section_title(title: str) -> str:
-    """Remove leading numeric prefixes for cleaner slide labels."""
+def compact_roadmap_label(title: str) -> str:
+    """Create a concise 1-4 word roadmap label."""
     cleaned = re.sub(r"^\d+\)\s*", "", title).strip()
-    return cleaned or title
+    words = re.findall(r"[A-Za-z0-9']+", cleaned)
+    if not words:
+        return cleaned or title
+    return " ".join(words[:4])
 
 
 def parse_markdown(markdown_text: str) -> tuple[str, list[Section]]:
@@ -222,9 +227,18 @@ def apply_background(slide, slide_width, slide_height) -> None:
     overlay.fill.fore_color.rgb = PALETTE["accent"]
     overlay.line.fill.background()
 
+    rail = slide.shapes.add_shape(
+        MSO_AUTO_SHAPE_TYPE.RECTANGLE, Inches(0.4), Inches(0.7), Inches(0.08), Inches(5.8)
+    )
+    rail.fill.solid()
+    rail.fill.fore_color.rgb = PALETTE["line"]
+    rail.line.fill.background()
+
 
 def add_footer(slide, slide_number: int) -> None:
-    footer = slide.shapes.add_textbox(Inches(0.58), Inches(6.86), Inches(12.15), Inches(0.25))
+    footer = slide.shapes.add_textbox(
+        Inches(0.58 + TEXT_SHIFT_INCHES), Inches(6.86), Inches(12.15), Inches(0.25)
+    )
     tf = footer.text_frame
     tf.clear()
     p = tf.paragraphs[0]
@@ -239,7 +253,9 @@ def add_title_slide(prs: Presentation, deck_title: str, subtitle: str) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_background(slide, prs.slide_width, prs.slide_height)
 
-    brand = slide.shapes.add_textbox(Inches(0.65), Inches(0.45), Inches(10.5), Inches(0.45))
+    brand = slide.shapes.add_textbox(
+        Inches(0.65 + TEXT_SHIFT_INCHES), Inches(0.45), Inches(10.5), Inches(0.45)
+    )
     brand_tf = brand.text_frame
     brand_tf.clear()
     bp = brand_tf.paragraphs[0]
@@ -249,7 +265,9 @@ def add_title_slide(prs: Presentation, deck_title: str, subtitle: str) -> None:
     bp.font.size = Pt(16)
     bp.font.color.rgb = PALETTE["accent"]
 
-    title_box = slide.shapes.add_textbox(Inches(0.9), Inches(1.28), Inches(11.7), Inches(2.4))
+    title_box = slide.shapes.add_textbox(
+        Inches(0.9 + TEXT_SHIFT_INCHES), Inches(1.28), Inches(11.6), Inches(2.4)
+    )
     tf = title_box.text_frame
     tf.clear()
     tf.vertical_anchor = MSO_ANCHOR.TOP
@@ -260,7 +278,9 @@ def add_title_slide(prs: Presentation, deck_title: str, subtitle: str) -> None:
     p.font.size = Pt(44)
     p.font.color.rgb = PALETTE["text"]
 
-    subtitle_box = slide.shapes.add_textbox(Inches(0.95), Inches(3.8), Inches(11.1), Inches(1.2))
+    subtitle_box = slide.shapes.add_textbox(
+        Inches(0.95 + TEXT_SHIFT_INCHES), Inches(3.8), Inches(11.0), Inches(1.2)
+    )
     stf = subtitle_box.text_frame
     stf.clear()
     sp = stf.paragraphs[0]
@@ -272,38 +292,37 @@ def add_title_slide(prs: Presentation, deck_title: str, subtitle: str) -> None:
     add_footer(slide, 1)
 
 
-def add_roadmap_slide(
-    prs: Presentation, sections: list[Section], slide_number: int, part: int, total_parts: int
-) -> None:
+def add_agenda_slide(prs: Presentation, sections: list[Section], slide_number: int) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_background(slide, prs.slide_width, prs.slide_height)
 
-    heading_label = "Training Roadmap"
-    if total_parts > 1:
-        heading_label = f"Training Roadmap ({part}/{total_parts})"
-
-    heading_box = slide.shapes.add_textbox(Inches(0.9), Inches(0.52), Inches(11.3), Inches(0.86))
+    heading_box = slide.shapes.add_textbox(
+        Inches(0.9 + TEXT_SHIFT_INCHES), Inches(0.55), Inches(10.7), Inches(0.8)
+    )
     htf = heading_box.text_frame
     htf.clear()
-    htf.word_wrap = True
-    htf.margin_left = Inches(0.01)
-    htf.margin_right = Inches(0.01)
     hp = htf.paragraphs[0]
-    hp.text = heading_label
+    hp.text = "Training Roadmap"
     hp.font.name = "Aptos Display"
     hp.font.bold = True
-    hp.font.size = Pt(28)
+    hp.font.size = Pt(31)
     hp.font.color.rgb = PALETTE["text"]
 
     panel = slide.shapes.add_shape(
-        MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, Inches(0.85), Inches(1.28), Inches(11.25), Inches(5.25)
+        MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, Inches(0.85), Inches(1.33), Inches(11.25), Inches(5.15)
     )
     panel.fill.solid()
     panel.fill.fore_color.rgb = PALETTE["panel"]
     panel.line.color.rgb = PALETTE["line"]
     panel.line.width = Pt(1.2)
 
-    visible_sections = sections
+    agenda = slide.shapes.add_textbox(Inches(1.15), Inches(1.63), Inches(10.55), Inches(4.55))
+    tf = agenda.text_frame
+    tf.clear()
+    tf.word_wrap = True
+
+    max_items = 18
+    visible_sections = sections[:max_items]
     col_count = 2
     per_col = math.ceil(len(visible_sections) / col_count)
     columns: list[list[str]] = []
@@ -313,31 +332,36 @@ def add_roadmap_slide(
         if start < len(visible_sections):
             columns.append(
                 [
-                    f"{i + 1}. {clean_section_title(sec.title)}"
+                    f"{i + 1}. {compact_roadmap_label(sec.title)}"
                     for i, sec in enumerate(visible_sections[start:end], start=start)
                 ]
             )
 
-    col_width = Inches(5.02)
+    col_width = Inches(5.05)
     for col_idx, col_items in enumerate(columns):
-        x = Inches(1.16) + Inches(5.2 * col_idx)
-        box = slide.shapes.add_textbox(x, Inches(1.57), col_width, Inches(4.72))
+        x = Inches(1.15 + TEXT_SHIFT_INCHES) + Inches(5.23 * col_idx)
+        box = slide.shapes.add_textbox(x, Inches(1.63), col_width, Inches(4.55))
         btf = box.text_frame
         btf.clear()
-        btf.word_wrap = True
-        btf.margin_left = Inches(0.02)
-        btf.margin_right = Inches(0.02)
-        safe_font = choose_safe_font(
-            [col_items], width_in=5.02, height_in=4.72, candidates=[14, 13, 12, 11], safety_ratio=0.9
-        )
         for idx, item in enumerate(col_items):
             paragraph = btf.paragraphs[0] if idx == 0 else btf.add_paragraph()
             paragraph.text = item
             paragraph.font.name = "Aptos"
-            paragraph.font.size = Pt(safe_font)
+            paragraph.font.size = Pt(15)
             paragraph.font.color.rgb = PALETTE["text"]
-            paragraph.space_after = Pt(5)
-            paragraph.line_spacing = 1.0
+            paragraph.space_after = Pt(7)
+
+    if len(sections) > max_items:
+        note = slide.shapes.add_textbox(
+            Inches(1.15 + TEXT_SHIFT_INCHES), Inches(6.15), Inches(9.4), Inches(0.3)
+        )
+        ntf = note.text_frame
+        ntf.clear()
+        np = ntf.paragraphs[0]
+        np.text = "Deck continues with additional subsections in detailed flow."
+        np.font.name = "Aptos"
+        np.font.size = Pt(10)
+        np.font.color.rgb = PALETTE["muted"]
 
     add_footer(slide, slide_number)
 
@@ -367,15 +391,12 @@ def estimate_required_lines(lines: list[str], width_in: float, font_pt: int) -> 
             required_lines += 0.45
             continue
         text = line.replace("### ", "", 1)
-        if re.match(r"^[-*]\s+", line):
-            # Account for rendered bullet prefix in final text.
-            text = re.sub(r"^[-*]\s+", "", text)
-            text = f"• {text}"
+        text = re.sub(r"^[-*]\s+", "", text)
         wraps = max(1, math.ceil(len(text) / chars_per_line))
         if line.startswith("### "):
             required_lines += wraps * 1.05
         else:
-            required_lines += wraps * 1.04
+            required_lines += wraps
     return required_lines
 
 
@@ -465,26 +486,21 @@ def add_content_slide(
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_background(slide, prs.slide_width, prs.slide_height)
 
-    heading_box = slide.shapes.add_textbox(Inches(0.9), Inches(0.42), Inches(11.2), Inches(0.98))
+    heading_box = slide.shapes.add_textbox(
+        Inches(0.9 + TEXT_SHIFT_INCHES), Inches(0.42), Inches(11.1), Inches(0.95)
+    )
     htf = heading_box.text_frame
     htf.clear()
-    htf.word_wrap = True
     htf.vertical_anchor = MSO_ANCHOR.TOP
-    htf.margin_left = Inches(0.01)
-    htf.margin_right = Inches(0.01)
-    htf.margin_top = Inches(0.01)
-    htf.margin_bottom = Inches(0.01)
     hp = htf.paragraphs[0]
     hp.text = heading
     hp.font.name = "Aptos Display"
     hp.font.bold = True
-    title_size = choose_safe_font(
-        [[heading]],
-        width_in=11.2,
-        height_in=0.98,
-        candidates=[27, 25, 23, 21, 19, 17],
-        safety_ratio=0.88,
-    )
+    title_size = 27
+    if len(heading) > 70:
+        title_size = 21
+    elif len(heading) > 52:
+        title_size = 23
     hp.font.size = Pt(title_size)
     hp.font.color.rgb = PALETTE["text"]
 
@@ -498,24 +514,22 @@ def add_content_slide(
 
     left_chunk, right_chunk = split_for_columns(content_chunk)
     if right_chunk is None:
-        body = slide.shapes.add_textbox(Inches(1.08), Inches(1.45), Inches(10.8), Inches(4.95))
+        body = slide.shapes.add_textbox(
+            Inches(1.08 + TEXT_SHIFT_INCHES), Inches(1.45), Inches(10.7), Inches(4.95)
+        )
         font_size = choose_safe_font(
-            [left_chunk],
-            width_in=10.8,
-            height_in=4.95,
-            candidates=[15, 14, 13, 12, 11],
-            safety_ratio=0.9,
+            [left_chunk], width_in=10.8, height_in=4.95, candidates=[15, 14, 13, 12, 11]
         )
         _render_text_lines(body.text_frame, left_chunk, body_font_size=font_size)
     else:
-        left_box = slide.shapes.add_textbox(Inches(1.05), Inches(1.45), Inches(5.2), Inches(4.95))
-        right_box = slide.shapes.add_textbox(Inches(6.4), Inches(1.45), Inches(5.2), Inches(4.95))
+        left_box = slide.shapes.add_textbox(
+            Inches(1.05 + TEXT_SHIFT_INCHES), Inches(1.45), Inches(5.1), Inches(4.95)
+        )
+        right_box = slide.shapes.add_textbox(
+            Inches(6.4 + TEXT_SHIFT_INCHES), Inches(1.45), Inches(5.1), Inches(4.95)
+        )
         font_size = choose_safe_font(
-            [left_chunk, right_chunk],
-            width_in=5.2,
-            height_in=4.95,
-            candidates=[14, 13, 12, 11, 10],
-            safety_ratio=0.9,
+            [left_chunk, right_chunk], width_in=5.2, height_in=4.95, candidates=[14, 13, 12, 11, 10]
         )
 
         _render_text_lines(left_box.text_frame, left_chunk, body_font_size=font_size)
@@ -539,20 +553,8 @@ def build_deck(markdown_path: Path, output_path: Path) -> int:
     slide_number = 1
     add_title_slide(prs, deck_title, subtitle)
 
-    roadmap_page_size = 10
-    roadmap_pages = [
-        grouped_sections[i : i + roadmap_page_size]
-        for i in range(0, len(grouped_sections), roadmap_page_size)
-    ]
-    for part, page_sections in enumerate(roadmap_pages, start=1):
-        slide_number += 1
-        add_roadmap_slide(
-            prs,
-            page_sections,
-            slide_number=slide_number,
-            part=part,
-            total_parts=max(1, len(roadmap_pages)),
-        )
+    slide_number += 1
+    add_agenda_slide(prs, grouped_sections, slide_number)
 
     for section in grouped_sections:
         normalized_lines = normalize_lines(section.lines)

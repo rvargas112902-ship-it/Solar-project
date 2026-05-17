@@ -417,7 +417,7 @@ def _render_text_lines(text_frame, lines: list[str], body_font_size: int) -> Non
             paragraph.text = line.replace("### ", "", 1)
             paragraph.font.name = "Aptos"
             paragraph.font.bold = True
-            paragraph.font.size = Pt(body_font_size + 1)
+            paragraph.font.size = Pt(body_font_size)
             paragraph.font.color.rgb = PALETTE["accent"]
             paragraph.space_after = Pt(3)
             continue

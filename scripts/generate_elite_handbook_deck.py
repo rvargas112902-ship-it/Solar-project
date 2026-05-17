@@ -357,6 +357,42 @@ def estimated_units(lines: list[str], width_chars: int) -> float:
     return units
 
 
+def estimate_required_lines(lines: list[str], width_in: float, font_pt: int) -> float:
+    chars_per_line = max(12, int(width_in * 113 / max(font_pt, 1)))
+    required_lines = 0.0
+    for line in lines:
+        if not line:
+            required_lines += 0.45
+            continue
+        text = line.replace("### ", "", 1)
+        text = re.sub(r"^[-*]\s+", "", text)
+        wraps = max(1, math.ceil(len(text) / chars_per_line))
+        if line.startswith("### "):
+            required_lines += wraps * 1.05
+        else:
+            required_lines += wraps
+    return required_lines
+
+
+def estimate_line_capacity(height_in: float, font_pt: int) -> float:
+    line_height_in = (font_pt / 72.0) * 1.04 + (1.8 / 72.0)
+    return height_in / line_height_in
+
+
+def choose_safe_font(
+    line_groups: list[list[str]],
+    width_in: float,
+    height_in: float,
+    candidates: list[int],
+    safety_ratio: float = 0.94,
+) -> int:
+    for font_pt in candidates:
+        capacity = estimate_line_capacity(height_in, font_pt) * safety_ratio
+        if all(estimate_required_lines(lines, width_in, font_pt) <= capacity for lines in line_groups):
+            return font_pt
+    return candidates[-1]
+
+
 def _render_text_lines(text_frame, lines: list[str], body_font_size: int) -> None:
     text_frame.clear()
     text_frame.word_wrap = True
@@ -451,33 +487,16 @@ def add_content_slide(
     left_chunk, right_chunk = split_for_columns(content_chunk)
     if right_chunk is None:
         body = slide.shapes.add_textbox(Inches(1.08), Inches(1.45), Inches(10.8), Inches(4.95))
-        units = estimated_units(left_chunk, width_chars=95)
-        font_size = 15
-        if units > 34:
-            font_size = 11
-        elif units > 30:
-            font_size = 12
-        elif units > 26:
-            font_size = 13
-        elif units > 22:
-            font_size = 14
+        font_size = choose_safe_font(
+            [left_chunk], width_in=10.8, height_in=4.95, candidates=[15, 14, 13, 12, 11]
+        )
         _render_text_lines(body.text_frame, left_chunk, body_font_size=font_size)
     else:
         left_box = slide.shapes.add_textbox(Inches(1.05), Inches(1.45), Inches(5.2), Inches(4.95))
         right_box = slide.shapes.add_textbox(Inches(6.4), Inches(1.45), Inches(5.2), Inches(4.95))
-
-        left_units = estimated_units(left_chunk, width_chars=44)
-        right_units = estimated_units(right_chunk, width_chars=44)
-        max_units = max(left_units, right_units)
-        font_size = 14
-        if max_units > 32:
-            font_size = 10
-        elif max_units > 28:
-            font_size = 11
-        elif max_units > 25:
-            font_size = 12
-        elif max_units > 22:
-            font_size = 13
+        font_size = choose_safe_font(
+            [left_chunk, right_chunk], width_in=5.2, height_in=4.95, candidates=[14, 13, 12, 11, 10]
+        )
 
         _render_text_lines(left_box.text_frame, left_chunk, body_font_size=font_size)
         _render_text_lines(right_box.text_frame, right_chunk, body_font_size=font_size)

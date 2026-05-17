@@ -150,6 +150,57 @@ def chunk_lines(lines: list[str], max_lines: int = 20, max_chars: int = 1700) ->
     return chunks
 
 
+def line_weight(line: str) -> float:
+    if not line:
+        return 0.45
+    if line.startswith("### "):
+        return 1.35
+    return 1.0
+
+
+def rebalance_chunks(chunks: list[list[str]], max_chunks: int = 2) -> list[list[str]]:
+    """Reduce pagination count while preserving line order."""
+    if len(chunks) <= max_chunks:
+        return chunks
+
+    lines: list[str] = [line for chunk in chunks for line in chunk]
+    total_weight = sum(line_weight(line) for line in lines)
+    if total_weight == 0:
+        return [lines]
+
+    target = total_weight / max_chunks
+    rebalanced: list[list[str]] = []
+    current: list[str] = []
+    running = 0.0
+    chunk_index = 1
+
+    for idx, line in enumerate(lines):
+        current.append(line)
+        running += line_weight(line)
+
+        lines_remaining = len(lines) - (idx + 1)
+        chunks_remaining = max_chunks - chunk_index
+        must_split = chunks_remaining > 0 and lines_remaining >= chunks_remaining
+        near_boundary = running >= (target * chunk_index)
+        split_point = line == "" or line.startswith("### ")
+
+        if must_split and near_boundary and split_point:
+            rebalanced.append(current)
+            current = []
+            chunk_index += 1
+
+    if current:
+        rebalanced.append(current)
+
+    while len(rebalanced) > max_chunks:
+        rebalanced[-2].extend(rebalanced[-1])
+        rebalanced.pop()
+    while len(rebalanced) < max_chunks:
+        rebalanced.append([])
+
+    return [chunk for chunk in rebalanced if chunk]
+
+
 def apply_background(slide, slide_width, slide_height) -> None:
     bg = slide.shapes.add_shape(
         MSO_AUTO_SHAPE_TYPE.RECTANGLE, 0, 0, slide_width, slide_height
@@ -289,14 +340,36 @@ def add_agenda_slide(prs: Presentation, sections: list[Section], slide_number: i
     add_footer(slide, slide_number)
 
 
+def estimated_units(lines: list[str], width_chars: int) -> float:
+    units = 0.0
+    for line in lines:
+        if not line:
+            units += 0.45
+            continue
+
+        text = line.replace("### ", "", 1)
+        text = re.sub(r"^[-*]\s+", "", text)
+        wraps = max(1, math.ceil(len(text) / width_chars))
+        if line.startswith("### "):
+            units += 1.0 + (0.75 * wraps)
+        else:
+            units += 0.8 * wraps
+    return units
+
+
 def _render_text_lines(text_frame, lines: list[str], body_font_size: int) -> None:
     text_frame.clear()
     text_frame.word_wrap = True
     text_frame.vertical_anchor = MSO_ANCHOR.TOP
+    text_frame.margin_left = Inches(0.02)
+    text_frame.margin_right = Inches(0.02)
+    text_frame.margin_top = Inches(0.01)
+    text_frame.margin_bottom = Inches(0.01)
 
     for index, line in enumerate(lines):
         paragraph = text_frame.paragraphs[0] if index == 0 else text_frame.add_paragraph()
-        paragraph.space_after = Pt(4)
+        paragraph.space_after = Pt(2)
+        paragraph.line_spacing = 1.0
         paragraph.alignment = PP_ALIGN.LEFT
 
         if not line:
@@ -310,7 +383,7 @@ def _render_text_lines(text_frame, lines: list[str], body_font_size: int) -> Non
             paragraph.font.bold = True
             paragraph.font.size = Pt(body_font_size + 1)
             paragraph.font.color.rgb = PALETTE["accent"]
-            paragraph.space_after = Pt(6)
+            paragraph.space_after = Pt(3)
             continue
 
         bullet_match = re.match(r"^[-*]\s+(.*)$", line)
@@ -324,11 +397,22 @@ def split_for_columns(content_chunk: list[str]) -> tuple[list[str], list[str] | 
     if len(content_chunk) <= 11:
         return content_chunk, None
 
-    midpoint = len(content_chunk) // 2
-    split_index = midpoint
-    for idx in range(midpoint, min(midpoint + 5, len(content_chunk) - 1)):
-        if content_chunk[idx] == "":
+    total_units = sum(line_weight(line) for line in content_chunk)
+    target = total_units / 2
+    running = 0.0
+    split_index = len(content_chunk) // 2
+
+    for idx, line in enumerate(content_chunk):
+        running += line_weight(line)
+        if running >= target and idx < len(content_chunk) - 1:
             split_index = idx + 1
+            break
+
+    window_start = max(1, split_index - 4)
+    window_end = min(len(content_chunk) - 1, split_index + 4)
+    for idx in range(window_start, window_end + 1):
+        if content_chunk[idx - 1] == "" or content_chunk[idx - 1].startswith("### "):
+            split_index = idx
             break
 
     return content_chunk[:split_index], content_chunk[split_index:]
@@ -340,7 +424,7 @@ def add_content_slide(
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_background(slide, prs.slide_width, prs.slide_height)
 
-    heading_box = slide.shapes.add_textbox(Inches(0.9), Inches(0.52), Inches(11.2), Inches(0.9))
+    heading_box = slide.shapes.add_textbox(Inches(0.9), Inches(0.45), Inches(11.2), Inches(0.8))
     htf = heading_box.text_frame
     htf.clear()
     htf.vertical_anchor = MSO_ANCHOR.TOP
@@ -348,11 +432,16 @@ def add_content_slide(
     hp.text = heading
     hp.font.name = "Aptos Display"
     hp.font.bold = True
-    hp.font.size = Pt(27)
+    title_size = 27
+    if len(heading) > 70:
+        title_size = 23
+    elif len(heading) > 52:
+        title_size = 25
+    hp.font.size = Pt(title_size)
     hp.font.color.rgb = PALETTE["text"]
 
     body_panel = slide.shapes.add_shape(
-        MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, Inches(0.85), Inches(1.3), Inches(11.2), Inches(5.22)
+        MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, Inches(0.85), Inches(1.2), Inches(11.2), Inches(5.45)
     )
     body_panel.fill.solid()
     body_panel.fill.fore_color.rgb = PALETTE["panel"]
@@ -361,13 +450,31 @@ def add_content_slide(
 
     left_chunk, right_chunk = split_for_columns(content_chunk)
     if right_chunk is None:
-        body = slide.shapes.add_textbox(Inches(1.15), Inches(1.58), Inches(10.6), Inches(4.7))
-        _render_text_lines(body.text_frame, left_chunk, body_font_size=16)
+        body = slide.shapes.add_textbox(Inches(1.08), Inches(1.42), Inches(10.8), Inches(5.0))
+        units = estimated_units(left_chunk, width_chars=95)
+        font_size = 16
+        if units > 28:
+            font_size = 14
+        elif units > 23:
+            font_size = 15
+        _render_text_lines(body.text_frame, left_chunk, body_font_size=font_size)
     else:
-        left_box = slide.shapes.add_textbox(Inches(1.12), Inches(1.55), Inches(5.1), Inches(4.74))
-        right_box = slide.shapes.add_textbox(Inches(6.45), Inches(1.55), Inches(5.1), Inches(4.74))
-        _render_text_lines(left_box.text_frame, left_chunk, body_font_size=14)
-        _render_text_lines(right_box.text_frame, right_chunk, body_font_size=14)
+        left_box = slide.shapes.add_textbox(Inches(1.05), Inches(1.4), Inches(5.2), Inches(5.0))
+        right_box = slide.shapes.add_textbox(Inches(6.4), Inches(1.4), Inches(5.2), Inches(5.0))
+
+        left_units = estimated_units(left_chunk, width_chars=44)
+        right_units = estimated_units(right_chunk, width_chars=44)
+        max_units = max(left_units, right_units)
+        font_size = 15
+        if max_units > 30:
+            font_size = 12
+        elif max_units > 26:
+            font_size = 13
+        elif max_units > 22:
+            font_size = 14
+
+        _render_text_lines(left_box.text_frame, left_chunk, body_font_size=font_size)
+        _render_text_lines(right_box.text_frame, right_chunk, body_font_size=font_size)
 
     add_footer(slide, slide_number)
 
@@ -393,6 +500,7 @@ def build_deck(markdown_path: Path, output_path: Path) -> int:
     for section in grouped_sections:
         normalized_lines = normalize_lines(section.lines)
         chunks = chunk_lines(normalized_lines)
+        chunks = rebalance_chunks(chunks, max_chunks=2)
 
         if not chunks:
             continue

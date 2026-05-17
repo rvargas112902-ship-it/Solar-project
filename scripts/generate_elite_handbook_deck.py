@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Generate an elite-standard slideshow from the appointment setter handbook."""
+"""Generate a dense, polished slideshow from the appointment setter handbook."""
 
 from __future__ import annotations
 
 import argparse
+import math
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -68,15 +69,46 @@ def parse_markdown(markdown_text: str) -> tuple[str, list[Section]]:
     return title, sections
 
 
+def group_sections(sections: list[Section]) -> list[Section]:
+    """Group nested headings under each level-2 section for compact slides."""
+    grouped: list[Section] = []
+    current: Section | None = None
+
+    for section in sections:
+        if section.level == 2:
+            if current is not None:
+                grouped.append(current)
+            current = Section(level=2, title=section.title, lines=list(section.lines))
+            continue
+
+        if current is None:
+            current = Section(level=2, title="Overview", lines=[])
+
+        if current.lines and current.lines[-1].strip():
+            current.lines.append("")
+        current.lines.append(f"### {section.title}")
+        current.lines.extend(section.lines)
+
+    if current is not None:
+        grouped.append(current)
+
+    return grouped
+
+
 def normalize_lines(lines: Iterable[str]) -> list[str]:
     normalized: list[str] = []
+    previous_empty = False
+
     for raw in lines:
         stripped = raw.strip()
         if stripped == "---":
             continue
         if not stripped:
-            normalized.append("")
+            if not previous_empty:
+                normalized.append("")
+            previous_empty = True
             continue
+        previous_empty = False
         normalized.append(clean_inline_markdown(stripped))
 
     while normalized and normalized[0] == "":
@@ -86,28 +118,31 @@ def normalize_lines(lines: Iterable[str]) -> list[str]:
     return normalized
 
 
-def chunk_lines(lines: list[str], max_lines: int = 12, max_chars: int = 850) -> list[list[str]]:
+def chunk_lines(lines: list[str], max_lines: int = 20, max_chars: int = 1700) -> list[list[str]]:
     if not lines:
         return []
 
     chunks: list[list[str]] = []
     current: list[str] = []
-    line_total = 0
+    visual_line_total = 0.0
     char_total = 0
 
     for line in lines:
-        next_line_total = line_total + 1
+        line_weight = 1.25 if line.startswith("### ") else 1.0
+        next_line_total = visual_line_total + line_weight
         next_char_total = char_total + len(line)
-        overflow = current and (next_line_total > max_lines or next_char_total > max_chars)
+        overflow = current and (
+            next_line_total > max_lines or next_char_total > max_chars
+        )
 
         if overflow:
             chunks.append(current)
             current = []
-            line_total = 0
+            visual_line_total = 0.0
             char_total = 0
 
         current.append(line)
-        line_total += 1
+        visual_line_total += line_weight
         char_total += len(line)
 
     if current:
@@ -139,13 +174,13 @@ def apply_background(slide, slide_width, slide_height) -> None:
 
 
 def add_footer(slide, slide_number: int) -> None:
-    footer = slide.shapes.add_textbox(Inches(0.6), Inches(6.8), Inches(12.1), Inches(0.35))
+    footer = slide.shapes.add_textbox(Inches(0.58), Inches(6.86), Inches(12.15), Inches(0.25))
     tf = footer.text_frame
     tf.clear()
     p = tf.paragraphs[0]
     p.text = f"Elite Appointment Setter Pitch Booklet  |  Slide {slide_number}"
     p.font.name = "Aptos"
-    p.font.size = Pt(10)
+    p.font.size = Pt(9)
     p.font.color.rgb = PALETTE["muted"]
     p.alignment = PP_ALIGN.RIGHT
 
@@ -164,7 +199,7 @@ def add_title_slide(prs: Presentation, deck_title: str, subtitle: str) -> None:
     bp.font.size = Pt(16)
     bp.font.color.rgb = PALETTE["accent"]
 
-    title_box = slide.shapes.add_textbox(Inches(0.9), Inches(1.4), Inches(10.8), Inches(2.3))
+    title_box = slide.shapes.add_textbox(Inches(0.9), Inches(1.28), Inches(11.7), Inches(2.4))
     tf = title_box.text_frame
     tf.clear()
     tf.vertical_anchor = MSO_ANCHOR.TOP
@@ -172,68 +207,140 @@ def add_title_slide(prs: Presentation, deck_title: str, subtitle: str) -> None:
     p.text = deck_title
     p.font.name = "Aptos Display"
     p.font.bold = True
-    p.font.size = Pt(46)
+    p.font.size = Pt(44)
     p.font.color.rgb = PALETTE["text"]
 
-    subtitle_box = slide.shapes.add_textbox(Inches(0.95), Inches(4.0), Inches(10.2), Inches(1.2))
+    subtitle_box = slide.shapes.add_textbox(Inches(0.95), Inches(3.8), Inches(11.1), Inches(1.2))
     stf = subtitle_box.text_frame
     stf.clear()
     sp = stf.paragraphs[0]
     sp.text = subtitle
     sp.font.name = "Aptos"
-    sp.font.size = Pt(21)
+    sp.font.size = Pt(20)
     sp.font.color.rgb = PALETTE["muted"]
 
     add_footer(slide, 1)
 
 
-def add_divider_slide(prs: Presentation, heading: str, slide_number: int) -> None:
+def add_agenda_slide(prs: Presentation, sections: list[Section], slide_number: int) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_background(slide, prs.slide_width, prs.slide_height)
 
+    heading_box = slide.shapes.add_textbox(Inches(0.9), Inches(0.55), Inches(10.8), Inches(0.8))
+    htf = heading_box.text_frame
+    htf.clear()
+    hp = htf.paragraphs[0]
+    hp.text = "Training Roadmap"
+    hp.font.name = "Aptos Display"
+    hp.font.bold = True
+    hp.font.size = Pt(31)
+    hp.font.color.rgb = PALETTE["text"]
+
     panel = slide.shapes.add_shape(
-        MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, Inches(0.95), Inches(1.55), Inches(11.15), Inches(3.7)
+        MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, Inches(0.85), Inches(1.33), Inches(11.25), Inches(5.15)
     )
     panel.fill.solid()
     panel.fill.fore_color.rgb = PALETTE["panel"]
     panel.line.color.rgb = PALETTE["line"]
-    panel.line.width = Pt(1.6)
+    panel.line.width = Pt(1.2)
 
-    label = slide.shapes.add_textbox(Inches(1.35), Inches(2.1), Inches(9.8), Inches(2.8))
-    tf = label.text_frame
+    agenda = slide.shapes.add_textbox(Inches(1.15), Inches(1.63), Inches(10.55), Inches(4.55))
+    tf = agenda.text_frame
     tf.clear()
-    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    tf.word_wrap = True
 
-    p = tf.paragraphs[0]
-    p.text = "SECTION"
-    p.font.name = "Aptos"
-    p.font.bold = True
-    p.font.size = Pt(15)
-    p.font.color.rgb = PALETTE["accent"]
-    p.alignment = PP_ALIGN.LEFT
+    max_items = 18
+    visible_sections = sections[:max_items]
+    col_count = 2
+    per_col = math.ceil(len(visible_sections) / col_count)
+    columns: list[list[str]] = []
+    for col_idx in range(col_count):
+        start = col_idx * per_col
+        end = min(start + per_col, len(visible_sections))
+        if start < len(visible_sections):
+            columns.append(
+                [f"{i + 1}. {sec.title}" for i, sec in enumerate(visible_sections[start:end], start=start)]
+            )
 
-    p2 = tf.add_paragraph()
-    p2.text = heading
-    p2.font.name = "Aptos Display"
-    p2.font.bold = True
-    p2.font.size = Pt(40)
-    p2.font.color.rgb = PALETTE["text"]
-    p2.alignment = PP_ALIGN.LEFT
+    col_width = Inches(5.05)
+    for col_idx, col_items in enumerate(columns):
+        x = Inches(1.15) + Inches(5.23 * col_idx)
+        box = slide.shapes.add_textbox(x, Inches(1.63), col_width, Inches(4.55))
+        btf = box.text_frame
+        btf.clear()
+        for idx, item in enumerate(col_items):
+            paragraph = btf.paragraphs[0] if idx == 0 else btf.add_paragraph()
+            paragraph.text = item
+            paragraph.font.name = "Aptos"
+            paragraph.font.size = Pt(15)
+            paragraph.font.color.rgb = PALETTE["text"]
+            paragraph.space_after = Pt(7)
+
+    if len(sections) > max_items:
+        note = slide.shapes.add_textbox(Inches(1.15), Inches(6.15), Inches(9.5), Inches(0.3))
+        ntf = note.text_frame
+        ntf.clear()
+        np = ntf.paragraphs[0]
+        np.text = "Deck continues with additional subsections in detailed flow."
+        np.font.name = "Aptos"
+        np.font.size = Pt(10)
+        np.font.color.rgb = PALETTE["muted"]
 
     add_footer(slide, slide_number)
 
 
+def _render_text_lines(text_frame, lines: list[str], body_font_size: int) -> None:
+    text_frame.clear()
+    text_frame.word_wrap = True
+    text_frame.vertical_anchor = MSO_ANCHOR.TOP
+
+    for index, line in enumerate(lines):
+        paragraph = text_frame.paragraphs[0] if index == 0 else text_frame.add_paragraph()
+        paragraph.space_after = Pt(4)
+        paragraph.alignment = PP_ALIGN.LEFT
+
+        if not line:
+            paragraph.text = ""
+            continue
+
+        is_subheading = line.startswith("### ")
+        if is_subheading:
+            paragraph.text = line.replace("### ", "", 1)
+            paragraph.font.name = "Aptos"
+            paragraph.font.bold = True
+            paragraph.font.size = Pt(body_font_size + 1)
+            paragraph.font.color.rgb = PALETTE["accent"]
+            paragraph.space_after = Pt(6)
+            continue
+
+        bullet_match = re.match(r"^[-*]\s+(.*)$", line)
+        paragraph.text = f"• {bullet_match.group(1)}" if bullet_match else line
+        paragraph.font.name = "Aptos"
+        paragraph.font.size = Pt(body_font_size)
+        paragraph.font.color.rgb = PALETTE["text"]
+
+
+def split_for_columns(content_chunk: list[str]) -> tuple[list[str], list[str] | None]:
+    if len(content_chunk) <= 11:
+        return content_chunk, None
+
+    midpoint = len(content_chunk) // 2
+    split_index = midpoint
+    for idx in range(midpoint, min(midpoint + 5, len(content_chunk) - 1)):
+        if content_chunk[idx] == "":
+            split_index = idx + 1
+            break
+
+    return content_chunk[:split_index], content_chunk[split_index:]
+
+
 def add_content_slide(
-    prs: Presentation,
-    heading: str,
-    content_chunk: list[str],
-    slide_number: int,
-    level: int,
+    prs: Presentation, heading: str, content_chunk: list[str], slide_number: int
 ) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_background(slide, prs.slide_width, prs.slide_height)
 
-    heading_box = slide.shapes.add_textbox(Inches(0.9), Inches(0.55), Inches(11.0), Inches(1.1))
+    heading_box = slide.shapes.add_textbox(Inches(0.9), Inches(0.52), Inches(11.2), Inches(0.9))
     htf = heading_box.text_frame
     htf.clear()
     htf.vertical_anchor = MSO_ANCHOR.TOP
@@ -241,42 +348,26 @@ def add_content_slide(
     hp.text = heading
     hp.font.name = "Aptos Display"
     hp.font.bold = True
-    hp.font.size = Pt(30 if level <= 2 else 26)
+    hp.font.size = Pt(27)
     hp.font.color.rgb = PALETTE["text"]
 
     body_panel = slide.shapes.add_shape(
-        MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, Inches(0.85), Inches(1.55), Inches(11.2), Inches(4.9)
+        MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, Inches(0.85), Inches(1.3), Inches(11.2), Inches(5.22)
     )
     body_panel.fill.solid()
     body_panel.fill.fore_color.rgb = PALETTE["panel"]
     body_panel.line.color.rgb = PALETTE["line"]
     body_panel.line.width = Pt(1.25)
 
-    body = slide.shapes.add_textbox(Inches(1.2), Inches(1.9), Inches(10.45), Inches(4.2))
-    btf = body.text_frame
-    btf.clear()
-    btf.word_wrap = True
-    btf.vertical_anchor = MSO_ANCHOR.TOP
-
-    for index, line in enumerate(content_chunk):
-        paragraph = btf.paragraphs[0] if index == 0 else btf.add_paragraph()
-        paragraph.space_after = Pt(7)
-
-        if not line:
-            paragraph.text = ""
-            continue
-
-        bullet_match = re.match(r"^[-*]\s+(.*)$", line)
-        if bullet_match:
-            text = f"• {bullet_match.group(1)}"
-        else:
-            text = line
-
-        paragraph.text = text
-        paragraph.font.name = "Aptos"
-        paragraph.font.size = Pt(18 if level <= 2 else 16)
-        paragraph.font.color.rgb = PALETTE["text"]
-        paragraph.alignment = PP_ALIGN.LEFT
+    left_chunk, right_chunk = split_for_columns(content_chunk)
+    if right_chunk is None:
+        body = slide.shapes.add_textbox(Inches(1.15), Inches(1.58), Inches(10.6), Inches(4.7))
+        _render_text_lines(body.text_frame, left_chunk, body_font_size=16)
+    else:
+        left_box = slide.shapes.add_textbox(Inches(1.12), Inches(1.55), Inches(5.1), Inches(4.74))
+        right_box = slide.shapes.add_textbox(Inches(6.45), Inches(1.55), Inches(5.1), Inches(4.74))
+        _render_text_lines(left_box.text_frame, left_chunk, body_font_size=14)
+        _render_text_lines(right_box.text_frame, right_chunk, body_font_size=14)
 
     add_footer(slide, slide_number)
 
@@ -284,6 +375,7 @@ def add_content_slide(
 def build_deck(markdown_path: Path, output_path: Path) -> int:
     markdown = markdown_path.read_text(encoding="utf-8")
     deck_title, sections = parse_markdown(markdown)
+    grouped_sections = group_sections(sections)
 
     subtitle = (
         "Door-to-Door Savings and Net Metering Pitch Execution Guide"
@@ -295,23 +387,14 @@ def build_deck(markdown_path: Path, output_path: Path) -> int:
     slide_number = 1
     add_title_slide(prs, deck_title, subtitle)
 
-    for section in sections:
-        if section.level == 2 and re.match(r"^\d+\)", section.title):
-            slide_number += 1
-            add_divider_slide(prs, section.title, slide_number)
+    slide_number += 1
+    add_agenda_slide(prs, grouped_sections, slide_number)
 
+    for section in grouped_sections:
         normalized_lines = normalize_lines(section.lines)
         chunks = chunk_lines(normalized_lines)
 
         if not chunks:
-            slide_number += 1
-            add_content_slide(
-                prs,
-                section.title,
-                ["(Section heading)"],
-                slide_number,
-                section.level,
-            )
             continue
 
         for part_index, chunk in enumerate(chunks, start=1):
@@ -319,7 +402,7 @@ def build_deck(markdown_path: Path, output_path: Path) -> int:
             if len(chunks) > 1:
                 title = f"{section.title} ({part_index}/{len(chunks)})"
             slide_number += 1
-            add_content_slide(prs, title, chunk, slide_number, section.level)
+            add_content_slide(prs, title, chunk, slide_number)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     prs.save(output_path)

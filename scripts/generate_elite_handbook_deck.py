@@ -118,7 +118,7 @@ def normalize_lines(lines: Iterable[str]) -> list[str]:
     return normalized
 
 
-def chunk_lines(lines: list[str], max_lines: int = 20, max_chars: int = 1700) -> list[list[str]]:
+def chunk_lines(lines: list[str], max_lines: int = 17, max_chars: int = 1450) -> list[list[str]]:
     if not lines:
         return []
 
@@ -397,13 +397,13 @@ def split_for_columns(content_chunk: list[str]) -> tuple[list[str], list[str] | 
     if len(content_chunk) <= 11:
         return content_chunk, None
 
-    total_units = sum(line_weight(line) for line in content_chunk)
+    total_units = estimated_units(content_chunk, width_chars=44)
     target = total_units / 2
     running = 0.0
     split_index = len(content_chunk) // 2
 
     for idx, line in enumerate(content_chunk):
-        running += line_weight(line)
+        running += estimated_units([line], width_chars=44)
         if running >= target and idx < len(content_chunk) - 1:
             split_index = idx + 1
             break
@@ -424,7 +424,7 @@ def add_content_slide(
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_background(slide, prs.slide_width, prs.slide_height)
 
-    heading_box = slide.shapes.add_textbox(Inches(0.9), Inches(0.45), Inches(11.2), Inches(0.8))
+    heading_box = slide.shapes.add_textbox(Inches(0.9), Inches(0.42), Inches(11.2), Inches(0.95))
     htf = heading_box.text_frame
     htf.clear()
     htf.vertical_anchor = MSO_ANCHOR.TOP
@@ -434,14 +434,14 @@ def add_content_slide(
     hp.font.bold = True
     title_size = 27
     if len(heading) > 70:
-        title_size = 23
+        title_size = 21
     elif len(heading) > 52:
-        title_size = 25
+        title_size = 23
     hp.font.size = Pt(title_size)
     hp.font.color.rgb = PALETTE["text"]
 
     body_panel = slide.shapes.add_shape(
-        MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, Inches(0.85), Inches(1.2), Inches(11.2), Inches(5.45)
+        MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, Inches(0.85), Inches(1.24), Inches(11.2), Inches(5.38)
     )
     body_panel.fill.solid()
     body_panel.fill.fore_color.rgb = PALETTE["panel"]
@@ -450,28 +450,34 @@ def add_content_slide(
 
     left_chunk, right_chunk = split_for_columns(content_chunk)
     if right_chunk is None:
-        body = slide.shapes.add_textbox(Inches(1.08), Inches(1.42), Inches(10.8), Inches(5.0))
+        body = slide.shapes.add_textbox(Inches(1.08), Inches(1.45), Inches(10.8), Inches(4.95))
         units = estimated_units(left_chunk, width_chars=95)
-        font_size = 16
-        if units > 28:
+        font_size = 15
+        if units > 34:
+            font_size = 11
+        elif units > 30:
+            font_size = 12
+        elif units > 26:
+            font_size = 13
+        elif units > 22:
             font_size = 14
-        elif units > 23:
-            font_size = 15
         _render_text_lines(body.text_frame, left_chunk, body_font_size=font_size)
     else:
-        left_box = slide.shapes.add_textbox(Inches(1.05), Inches(1.4), Inches(5.2), Inches(5.0))
-        right_box = slide.shapes.add_textbox(Inches(6.4), Inches(1.4), Inches(5.2), Inches(5.0))
+        left_box = slide.shapes.add_textbox(Inches(1.05), Inches(1.45), Inches(5.2), Inches(4.95))
+        right_box = slide.shapes.add_textbox(Inches(6.4), Inches(1.45), Inches(5.2), Inches(4.95))
 
         left_units = estimated_units(left_chunk, width_chars=44)
         right_units = estimated_units(right_chunk, width_chars=44)
         max_units = max(left_units, right_units)
-        font_size = 15
-        if max_units > 30:
+        font_size = 14
+        if max_units > 32:
+            font_size = 10
+        elif max_units > 28:
+            font_size = 11
+        elif max_units > 25:
             font_size = 12
-        elif max_units > 26:
-            font_size = 13
         elif max_units > 22:
-            font_size = 14
+            font_size = 13
 
         _render_text_lines(left_box.text_frame, left_chunk, body_font_size=font_size)
         _render_text_lines(right_box.text_frame, right_chunk, body_font_size=font_size)

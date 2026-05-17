@@ -367,12 +367,15 @@ def estimate_required_lines(lines: list[str], width_in: float, font_pt: int) -> 
             required_lines += 0.45
             continue
         text = line.replace("### ", "", 1)
-        text = re.sub(r"^[-*]\s+", "", text)
+        if re.match(r"^[-*]\s+", line):
+            # Account for rendered bullet prefix in final text.
+            text = re.sub(r"^[-*]\s+", "", text)
+            text = f"• {text}"
         wraps = max(1, math.ceil(len(text) / chars_per_line))
         if line.startswith("### "):
             required_lines += wraps * 1.05
         else:
-            required_lines += wraps
+            required_lines += wraps * 1.04
     return required_lines
 
 

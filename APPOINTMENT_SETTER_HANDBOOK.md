@@ -689,16 +689,22 @@ Use this structure:
 3. **Move forward** - Ask a small question that continues the pitch.
 
 ## "Not interested."
-"Totally fair. Most people are not interested in another pitch. They are interested in seeing if net metering can beat Duke on price. Real quick, are your bills usually under $50 or over $150?"
+"I get it, and I'll be quick. It is important because it is tied to the power lines connected to your house. Have you seen all the construction going on?"
 
 ## "I don't have time."
 "Same here. That is why I started with 'I don't have much time.' Before I run, what does your bill usually get to in the summer?"
 
-## "I need to talk to my spouse."
-"Exactly, and that is why we only do the walkthrough when both people are there. Is tomorrow at 5:45 or 6:30 better?"
+## "Is this solar?"
+"This is completely different. This is Duke Energy's net metering program. All we check is your usage to see if you qualify for a 30-50% reduction on the electric bill. Do you get this online or on paper?"
 
-## "I heard this is a scam."
-"You are right to be cautious. That is why we do not guess. We use your actual Duke bill and compare the net metering numbers first. If I can't save you money, you would tell me no anyway. Do you get your bill online or paper?"
+## "So how do you get the power?"
+"First, I need to make sure I can actually save you money and cover all your power. If it ends up costing more, does it really matter how we get the power?"
+
+## "My power lines are already underground."
+"Exactly, and they are doing this project all over the state of Florida. Duke is still charging an additional 18% to put other people's lines underground. Have you seen the increases in the last couple of months?"
+
+## "I don't like change."
+"Got it. I am not here to make you change anything. We are operating under Duke Energy's net metering program. Would you benefit from lowering your bill 30-50%?"
 
 ## "My bill is already low."
 "That may mean you are already in the group where this does not make sense. What does it usually hit at the highest point?"

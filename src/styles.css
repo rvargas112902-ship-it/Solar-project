@@ -139,11 +139,6 @@ button:disabled {
   color: #31548c;
 }
 
-.icon-button.danger {
-  background: #fff0f2;
-  color: #c2415d;
-}
-
 .primary-button:hover,
 .ghost-button:hover,
 .text-button:hover,
@@ -179,10 +174,41 @@ button:disabled {
   line-height: 1;
 }
 
-.score-card p {
-  margin: 12px 0 0;
-  color: #64748b;
-  font-weight: 700;
+.score-denominator {
+  margin-top: 2px;
+  color: #94a3b8;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.overall-label {
+  margin-top: 10px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.overall-label.score-elite {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.overall-label.score-good {
+  background: #e8fff9;
+  color: #0f766e;
+}
+
+.overall-label.score-mid {
+  background: #fff8e6;
+  color: #b45309;
+}
+
+.overall-label.score-low {
+  background: #fff0f2;
+  color: #dc2626;
 }
 
 .grade-label {
@@ -191,19 +217,6 @@ button:disabled {
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-}
-
-.score-ring {
-  display: grid;
-  width: 106px;
-  height: 106px;
-  margin-top: 12px;
-  place-items: center;
-  border: 10px solid #35d7c5;
-  border-radius: 50%;
-  color: #0f766e;
-  font-size: 1.45rem;
-  font-weight: 900;
 }
 
 .workspace-grid {
@@ -241,36 +254,22 @@ button:disabled {
   color: #64748b;
 }
 
-.transcript-panel textarea,
-.criterion-editor textarea,
-.criterion-editor input {
+.transcript-panel textarea {
   width: 100%;
+  min-height: 370px;
+  margin-top: 16px;
+  padding: 18px;
   border: 1px solid #dce5f2;
   border-radius: 16px;
   background: #fbfdff;
   color: #13233d;
   outline: none;
+  resize: vertical;
 }
 
-.transcript-panel textarea:focus,
-.criterion-editor textarea:focus,
-.criterion-editor input:focus {
+.transcript-panel textarea:focus {
   border-color: #35d7c5;
   box-shadow: 0 0 0 4px rgba(53, 215, 197, 0.14);
-}
-
-.transcript-panel textarea {
-  min-height: 370px;
-  margin-top: 16px;
-  padding: 18px;
-  resize: vertical;
-}
-
-.small-textarea {
-  min-height: 76px;
-  margin-top: 7px;
-  padding: 12px;
-  resize: vertical;
 }
 
 .interim {
@@ -294,8 +293,7 @@ button:disabled {
   background: #f5f8fc;
 }
 
-.metric-card span,
-.keyword-label {
+.metric-card span {
   color: #64748b;
   font-size: 0.74rem;
   font-weight: 900;
@@ -310,51 +308,89 @@ button:disabled {
   font-size: 1.35rem;
 }
 
-.criteria-list {
+/* Score bars */
+
+.score-bars {
   display: grid;
-  gap: 14px;
-  max-height: 760px;
-  overflow: auto;
-  padding-right: 4px;
+  gap: 18px;
 }
 
-.criterion-editor {
+.score-bar-item {
   display: grid;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid #e3ebf6;
-  border-radius: 20px;
-  background: #fbfdff;
+  gap: 8px;
 }
 
-.criterion-editor label {
+.score-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.score-bar-name {
+  color: #334155;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.score-bar-header strong {
+  font-size: 1.15rem;
+}
+
+.score-max {
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.score-bar-track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e9eef7;
+}
+
+.score-bar-track span {
   display: block;
-  color: #49627f;
-  font-size: 0.82rem;
-  font-weight: 900;
+  height: 100%;
+  border-radius: inherit;
+  transition: width 300ms ease;
 }
 
-.criterion-editor input {
-  margin-top: 7px;
-  padding: 11px 12px;
+.score-bar-track .score-elite {
+  background: linear-gradient(90deg, #a78bfa, #7c3aed);
 }
 
-.criterion-title-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
+.score-bar-track .score-good {
+  background: linear-gradient(90deg, #35d7c5, #0f766e);
 }
 
-.criterion-title-row input {
-  margin-top: 0;
-  font-weight: 800;
+.score-bar-track .score-mid {
+  background: linear-gradient(90deg, #fbbf24, #d97706);
 }
 
-.criterion-grid {
-  display: grid;
-  grid-template-columns: 110px minmax(0, 1fr);
-  gap: 12px;
+.score-bar-track .score-low {
+  background: linear-gradient(90deg, #fca5a5, #dc2626);
 }
+
+/* Score colors (text) */
+
+.score-elite {
+  color: #7c3aed;
+}
+
+.score-good {
+  color: #0f766e;
+}
+
+.score-mid {
+  color: #d97706;
+}
+
+.score-low {
+  color: #dc2626;
+}
+
+/* Results */
 
 .results-grid {
   display: grid;
@@ -376,15 +412,14 @@ button:disabled {
   justify-content: space-between;
 }
 
-.result-header p,
+.result-header strong {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
 .feedback {
   margin: 6px 0 0;
   color: #64748b;
-}
-
-.result-header strong {
-  color: #0f766e;
-  font-size: 1.6rem;
 }
 
 .progress-track {
@@ -399,64 +434,65 @@ button:disabled {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #35d7c5, #377dff);
+  transition: width 300ms ease;
 }
 
-.keyword-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 16px;
+.progress-track .score-elite {
+  background: linear-gradient(90deg, #a78bfa, #7c3aed);
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
+.progress-track .score-good {
+  background: linear-gradient(90deg, #35d7c5, #0f766e);
 }
 
-.chip,
-.empty-chip {
+.progress-track .score-mid {
+  background: linear-gradient(90deg, #fbbf24, #d97706);
+}
+
+.progress-track .score-low {
+  background: linear-gradient(90deg, #fca5a5, #dc2626);
+}
+
+/* Findings (strengths / weaknesses) */
+
+.finding-list {
+  margin-top: 12px;
+}
+
+.finding-label {
   display: inline-flex;
-  padding: 5px 9px;
-  border-radius: 999px;
-  background: #fff3f3;
-  color: #b42338;
-  font-size: 0.78rem;
-  font-weight: 800;
+  gap: 5px;
+  align-items: center;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.chip.positive {
-  background: #e8fff9;
+.finding-label.positive {
   color: #0f766e;
 }
 
-.empty-chip {
-  background: #eef2f7;
-  color: #64748b;
+.finding-label.negative {
+  color: #b45309;
 }
 
-.recommendations {
-  margin-top: 22px;
-  padding: 18px;
-  border-radius: 22px;
-  background: #10213a;
-  color: white;
+.finding-list ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
 }
 
-.recommendations h3 {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin: 0 0 10px;
-  color: white;
+.finding-list li {
+  margin-bottom: 2px;
+  font-size: 0.88rem;
 }
 
-.recommendations ul {
-  margin: 0;
-  padding-left: 20px;
-  color: rgba(255, 255, 255, 0.78);
+.finding-positive {
+  color: #155e75;
+}
+
+.finding-negative {
+  color: #92400e;
 }
 
 @media (max-width: 1060px) {
@@ -483,9 +519,7 @@ button:disabled {
     border-radius: 24px;
   }
 
-  .metric-grid,
-  .keyword-row,
-  .criterion-grid {
+  .metric-grid {
     grid-template-columns: 1fr;
   }
 

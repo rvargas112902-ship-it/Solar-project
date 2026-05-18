@@ -1,16 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  AlertTriangle,
   BarChart3,
   CheckCircle2,
-  ClipboardList,
   Mic,
   MicOff,
-  Plus,
-  RotateCcw,
   Sparkles,
-  Trash2,
+  Target,
 } from "lucide-react";
-import { Criterion, defaultCriteria, gradePitch } from "./grading";
+import { evaluatePitch, CategoryScore } from "./grading";
 
 type SpeechRecognitionResultItem = {
   transcript: string;
@@ -51,50 +49,57 @@ declare global {
   }
 }
 
-const samplePitch = `Thanks for meeting today. My goal is to understand your current sales process, the challenges slowing the team down, and what timeline matters for fixing it.
+const samplePitch = `Setter: Hey listen, I don't have much time. Do you see these powerlines here?
 
-What challenge is most urgent for your team right now? How are you measuring ROI, and who else is involved in the decision? If we can reduce manual follow up and increase booked demos, your reps can spend more time with qualified buyers.
+Homeowner: Yeah.
 
-I understand budget is a concern; however, the value comes from saving time and reducing missed opportunities. The next step is to schedule a short demo with your sales manager this week, then I can send over a proposal.`;
+Setter: They're going underground because of the storm outages. That way if something major happens again, the area has more reliable power. Does that make sense?
 
-const formatKeywords = (keywords: string[]) => keywords.join(", ");
+Homeowner: Yeah, we lost power for two days.
 
-const parseKeywords = (value: string) =>
-  value
-    .split(",")
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean);
+Setter: Exactly, a lot of people around here did. The frustrating part is Duke is increasing rates to pay for all that infrastructure, so people are paying more for the same amount of power.
 
-const loadCriteria = () => {
-  try {
-    const stored = localStorage.getItem("sales-pitch-grader-criteria");
-    if (!stored) return defaultCriteria;
+Homeowner: Yeah, our bill has definitely gone up.
 
-    const parsed = JSON.parse(stored) as Criterion[];
-    return Array.isArray(parsed) && parsed.length ? parsed : defaultCriteria;
-  } catch {
-    return defaultCriteria;
-  }
+Setter: That's why I stopped. If we can get you the power you're already using from Duke for significantly cheaper, we'll show you exactly what it looks like. Most neighbors are only paying $35-$40, so we probably can't help them. What's the lowest your Duke bill gets?
+
+Homeowner: $180 on the low end.
+
+Setter: Got it. And if I can't even save you money and it ends up costing more, what are you going to tell me?
+
+Homeowner: No.
+
+Setter: Exactly. What I look at is the squiggly line on your bill. It tells me how much power you are pulling annually and lets me know if I can save you money. Do you get this online or paper?`;
+
+const getScoreClass = (score: number): string => {
+  if (score >= 8) return "score-elite";
+  if (score >= 6) return "score-good";
+  if (score >= 4) return "score-mid";
+  return "score-low";
+};
+
+const getOverallLabel = (score: number): string => {
+  if (score === 0) return "N/A";
+  if (score >= 8) return "Elite";
+  if (score >= 7) return "Strong";
+  if (score >= 5) return "Average";
+  if (score >= 3) return "Below Avg";
+  return "Weak";
 };
 
 const App = () => {
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
-  const [criteria, setCriteria] = useState<Criterion[]>(loadCriteria);
   const [isRecording, setIsRecording] = useState(false);
   const [recorderMessage, setRecorderMessage] = useState(
     "Use your browser microphone or paste a completed pitch transcript.",
   );
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
-  const grade = useMemo(() => gradePitch(transcript, criteria), [criteria, transcript]);
+  const evaluation = useMemo(() => evaluatePitch(transcript), [transcript]);
   const speechSupported =
     typeof window !== "undefined" &&
     Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
-
-  useEffect(() => {
-    localStorage.setItem("sales-pitch-grader-criteria", JSON.stringify(criteria));
-  }, [criteria]);
 
   useEffect(() => {
     return () => {
@@ -103,7 +108,8 @@ const App = () => {
   }, []);
 
   const startRecording = () => {
-    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const Recognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!Recognition) {
       setRecorderMessage(
@@ -120,7 +126,11 @@ const App = () => {
       let finalText = "";
       let interimText = "";
 
-      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+      for (
+        let index = event.resultIndex;
+        index < event.results.length;
+        index += 1
+      ) {
         const result = event.results[index];
         if (result.isFinal) {
           finalText += `${result[0].transcript} `;
@@ -130,12 +140,17 @@ const App = () => {
       }
 
       if (finalText) {
-        setTranscript((current) => `${current}${current ? " " : ""}${finalText.trim()}`);
+        setTranscript(
+          (current) =>
+            `${current}${current ? " " : ""}${finalText.trim()}`,
+        );
       }
       setInterimTranscript(interimText);
     };
     recognition.onerror = () => {
-      setRecorderMessage("Recording stopped because the browser could not access audio.");
+      setRecorderMessage(
+        "Recording stopped because the browser could not access audio.",
+      );
       setIsRecording(false);
     };
     recognition.onend = () => {
@@ -146,59 +161,31 @@ const App = () => {
     recognitionRef.current = recognition;
     recognition.start();
     setIsRecording(true);
-    setRecorderMessage("Recording in progress. Speak naturally; final text will appear below.");
+    setRecorderMessage(
+      "Recording in progress. Speak naturally; final text will appear below.",
+    );
   };
 
   const stopRecording = () => {
     recognitionRef.current?.stop();
     setIsRecording(false);
-    setRecorderMessage("Recording stopped. Review the transcript and grading results.");
-  };
-
-  const updateCriterion = <Key extends keyof Criterion>(
-    id: string,
-    key: Key,
-    value: Criterion[Key],
-  ) => {
-    setCriteria((current) =>
-      current.map((criterion) =>
-        criterion.id === id ? { ...criterion, [key]: value } : criterion,
-      ),
+    setRecorderMessage(
+      "Recording stopped. Review the transcript and evaluation results.",
     );
   };
-
-  const addCriterion = () => {
-    const nextNumber = criteria.length + 1;
-    setCriteria((current) => [
-      ...current,
-      {
-        id: `custom-${Date.now()}`,
-        title: `Custom expectation ${nextNumber}`,
-        expectation: "Describe the behavior or talk track you expect to hear.",
-        weight: 10,
-        keywords: ["example"],
-      },
-    ]);
-  };
-
-  const removeCriterion = (id: string) => {
-    setCriteria((current) => current.filter((criterion) => criterion.id !== id));
-  };
-
-  const resetCriteria = () => setCriteria(defaultCriteria);
 
   return (
     <main className="app-shell">
       <section className="hero">
         <div>
           <p className="eyebrow">
-            <Sparkles size={18} /> Sales pitch intelligence
+            <Sparkles size={18} /> Elite pitch evaluator
           </p>
-          <h1>Transcribe pitches and grade them against your playbook.</h1>
+          <h1>Grade appointment setter pitches with precision.</h1>
           <p className="hero-copy">
-            Record a rep's talk track, paste a transcript, or use the sample pitch. The app
-            scores each expectation from your custom rubric and turns missed points into coaching
-            recommendations.
+            Paste a transcript, record live, or load the sample door pitch. The
+            evaluator scores 6 categories on a strict 1-10 scale and returns
+            concise, analytical feedback.
           </p>
           <div className="hero-actions">
             <button
@@ -209,27 +196,31 @@ const App = () => {
               {isRecording ? <MicOff size={18} /> : <Mic size={18} />}
               {isRecording ? "Stop recording" : "Start transcription"}
             </button>
-            <button className="ghost-button" type="button" onClick={() => setTranscript(samplePitch)}>
+            <button
+              className="ghost-button"
+              type="button"
+              onClick={() => setTranscript(samplePitch)}
+            >
               Load sample pitch
             </button>
           </div>
           {!speechSupported && (
             <p className="browser-note">
-              Your current browser may not support live Web Speech transcription. Pasting a
-              transcript still works.
+              Your current browser may not support live Web Speech
+              transcription. Pasting a transcript still works.
             </p>
           )}
         </div>
 
         <aside className="score-card">
-          <span className="grade-label">Overall grade</span>
-          <strong>{grade.letterGrade}</strong>
-          <div className="score-ring" aria-label={`${grade.overallPercentage}%`}>
-            {grade.overallPercentage}%
-          </div>
-          <p>
-            {grade.overallScore} / {grade.totalPossible} rubric points
-          </p>
+          <span className="grade-label">Overall score</span>
+          <strong className={getScoreClass(evaluation.overallScore)}>
+            {evaluation.overallScore || "—"}
+          </strong>
+          <div className="score-denominator">/ 10</div>
+          <span className={`overall-label ${getScoreClass(evaluation.overallScore)}`}>
+            {getOverallLabel(evaluation.overallScore)}
+          </span>
         </aside>
       </section>
 
@@ -242,7 +233,11 @@ const App = () => {
               </p>
               <h2>Capture the pitch</h2>
             </div>
-            <button className="text-button" type="button" onClick={() => setTranscript("")}>
+            <button
+              className="text-button"
+              type="button"
+              onClick={() => setTranscript("")}
+            >
               Clear
             </button>
           </div>
@@ -258,10 +253,16 @@ const App = () => {
             </p>
           )}
           <div className="metric-grid">
-            <Metric label="Words" value={grade.metrics.wordCount} />
-            <Metric label="Questions" value={grade.metrics.questionCount} />
-            <Metric label="Filler words" value={grade.metrics.fillerCount} />
-            <Metric label="Next step" value={grade.metrics.nextStepMentioned ? "Yes" : "No"} />
+            <Metric label="Words" value={evaluation.metrics.wordCount} />
+            <Metric label="Questions" value={evaluation.metrics.questionCount} />
+            <Metric
+              label="Open-ended"
+              value={evaluation.metrics.openEndedQuestionCount}
+            />
+            <Metric
+              label="Filler words"
+              value={evaluation.metrics.fillerWordCount}
+            />
           </div>
         </div>
 
@@ -269,81 +270,14 @@ const App = () => {
           <div className="panel-heading">
             <div>
               <p className="eyebrow">
-                <ClipboardList size={16} /> Rubric
+                <Target size={16} /> Category scores
               </p>
-              <h2>Set grading expectations</h2>
-            </div>
-            <div className="button-row">
-              <button className="icon-button" type="button" onClick={resetCriteria} aria-label="Reset criteria">
-                <RotateCcw size={16} />
-              </button>
-              <button className="icon-button" type="button" onClick={addCriterion} aria-label="Add criterion">
-                <Plus size={16} />
-              </button>
+              <h2>Evaluation overview</h2>
             </div>
           </div>
-          <div className="criteria-list">
-            {criteria.map((criterion) => (
-              <article className="criterion-editor" key={criterion.id}>
-                <div className="criterion-title-row">
-                  <input
-                    value={criterion.title}
-                    onChange={(event) =>
-                      updateCriterion(criterion.id, "title", event.target.value)
-                    }
-                    aria-label="Criterion title"
-                  />
-                  <button
-                    className="icon-button danger"
-                    type="button"
-                    onClick={() => removeCriterion(criterion.id)}
-                    aria-label={`Remove ${criterion.title}`}
-                    disabled={criteria.length === 1}
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-                <label>
-                  Expectation
-                  <textarea
-                    className="small-textarea"
-                    value={criterion.expectation}
-                    onChange={(event) =>
-                      updateCriterion(criterion.id, "expectation", event.target.value)
-                    }
-                  />
-                </label>
-                <div className="criterion-grid">
-                  <label>
-                    Weight
-                    <input
-                      min="1"
-                      type="number"
-                      value={criterion.weight}
-                      onChange={(event) =>
-                        updateCriterion(
-                          criterion.id,
-                          "weight",
-                          Math.max(1, Number(event.target.value) || 1),
-                        )
-                      }
-                    />
-                  </label>
-                  <label>
-                    Keywords or phrases
-                    <input
-                      value={formatKeywords(criterion.keywords)}
-                      onChange={(event) =>
-                        updateCriterion(
-                          criterion.id,
-                          "keywords",
-                          parseKeywords(event.target.value),
-                        )
-                      }
-                    />
-                  </label>
-                </div>
-              </article>
+          <div className="score-bars">
+            {evaluation.categoryScores.map((cat) => (
+              <ScoreBar key={cat.id} category={cat} />
             ))}
           </div>
         </div>
@@ -353,44 +287,17 @@ const App = () => {
         <div className="panel-heading">
           <div>
             <p className="eyebrow">
-              <BarChart3 size={16} /> Coaching report
+              <BarChart3 size={16} /> Detailed evaluation
             </p>
-            <h2>Grading breakdown</h2>
+            <h2>Category breakdown</h2>
           </div>
-          <p className="muted">{grade.summary}</p>
+          <p className="muted">{evaluation.summary}</p>
         </div>
 
         <div className="results-grid">
-          {grade.criterionScores.map((criterion) => (
-            <article className="result-card" key={criterion.criterionId}>
-              <div className="result-header">
-                <div>
-                  <h3>{criterion.title}</h3>
-                  <p>{criterion.expectation}</p>
-                </div>
-                <strong>{criterion.percentage}%</strong>
-              </div>
-              <div className="progress-track">
-                <span style={{ width: `${criterion.percentage}%` }} />
-              </div>
-              <p className="feedback">{criterion.feedback}</p>
-              <div className="keyword-row">
-                <KeywordList label="Heard" values={criterion.matchedKeywords} positive />
-                <KeywordList label="Missing" values={criterion.missedKeywords} />
-              </div>
-            </article>
+          {evaluation.categoryScores.map((cat) => (
+            <CategoryCard key={cat.id} category={cat} />
           ))}
-        </div>
-
-        <div className="recommendations">
-          <h3>
-            <CheckCircle2 size={18} /> Recommended coaching
-          </h3>
-          <ul>
-            {grade.recommendations.map((recommendation) => (
-              <li key={recommendation}>{recommendation}</li>
-            ))}
-          </ul>
         </div>
       </section>
     </main>
@@ -409,27 +316,78 @@ const Metric = ({ label, value }: MetricProps) => (
   </div>
 );
 
-type KeywordListProps = {
-  label: string;
-  values: string[];
-  positive?: boolean;
+type ScoreBarProps = {
+  category: CategoryScore;
 };
 
-const KeywordList = ({ label, values, positive = false }: KeywordListProps) => (
-  <div>
-    <span className="keyword-label">{label}</span>
-    <div className="chips">
-      {values.length ? (
-        values.map((value) => (
-          <span className={positive ? "chip positive" : "chip"} key={value}>
-            {value}
-          </span>
-        ))
-      ) : (
-        <span className="empty-chip">None</span>
-      )}
+const ScoreBar = ({ category }: ScoreBarProps) => (
+  <div className="score-bar-item">
+    <div className="score-bar-header">
+      <span className="score-bar-name">{category.name}</span>
+      <strong className={getScoreClass(category.score)}>
+        {category.score}
+        <span className="score-max">/10</span>
+      </strong>
+    </div>
+    <div className="score-bar-track">
+      <span
+        className={getScoreClass(category.score)}
+        style={{ width: `${category.score * 10}%` }}
+      />
     </div>
   </div>
+);
+
+type CategoryCardProps = {
+  category: CategoryScore;
+};
+
+const CategoryCard = ({ category }: CategoryCardProps) => (
+  <article className="result-card">
+    <div className="result-header">
+      <div>
+        <h3>{category.name}</h3>
+      </div>
+      <strong className={getScoreClass(category.score)}>
+        {category.score}
+      </strong>
+    </div>
+    <div className="progress-track">
+      <span
+        className={getScoreClass(category.score)}
+        style={{ width: `${category.score * 10}%` }}
+      />
+    </div>
+    <p className="feedback">{category.feedback}</p>
+    {category.strengths.length > 0 && (
+      <div className="finding-list">
+        <span className="finding-label positive">
+          <CheckCircle2 size={13} /> Strengths
+        </span>
+        <ul>
+          {category.strengths.map((s) => (
+            <li key={s} className="finding-positive">
+              {s}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+    {category.weaknesses.length > 0 && (
+      <div className="finding-list">
+        <span className="finding-label negative">
+          <AlertTriangle size={13} /> Weaknesses
+        </span>
+        <ul>
+          {category.weaknesses.map((w) => (
+            <li key={w} className="finding-negative">
+              {w}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </article>
 );
 
 export default App;

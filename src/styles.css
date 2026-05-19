@@ -495,6 +495,131 @@ button:disabled {
   color: #92400e;
 }
 
+/* Speaker identification */
+
+.speaker-section {
+  margin-bottom: 24px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #e9eef7;
+}
+
+.speaker-cards {
+  display: grid;
+  gap: 12px;
+}
+
+.speaker-card {
+  padding: 14px 16px;
+  border: 1px solid #e2eaf6;
+  border-radius: 16px;
+  background: #fbfdff;
+}
+
+.speaker-card.setter {
+  border-left: 4px solid #0f766e;
+}
+
+.speaker-card.prospect {
+  border-left: 4px solid #d97706;
+}
+
+.speaker-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.speaker-name {
+  color: #13233d;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.speaker-role-badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.speaker-role-badge.setter {
+  background: #e8fff9;
+  color: #0f766e;
+}
+
+.speaker-role-badge.prospect {
+  background: #fff8e6;
+  color: #b45309;
+}
+
+.speaker-confidence {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.confidence-label {
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.confidence-bar-track {
+  flex: 1;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e9eef7;
+}
+
+.confidence-bar-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transition: width 300ms ease;
+}
+
+.confidence-bar-track .setter {
+  background: linear-gradient(90deg, #35d7c5, #0f766e);
+}
+
+.confidence-bar-track .prospect {
+  background: linear-gradient(90deg, #fbbf24, #d97706);
+}
+
+.confidence-value {
+  min-width: 36px;
+  color: #334155;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.speaker-signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.signal-chip {
+  display: inline-flex;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #f0f4fa;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
 @media (max-width: 1060px) {
   .hero,
   .workspace-grid,

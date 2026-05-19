@@ -9,6 +9,7 @@ describe("evaluatePitch", () => {
     expect(result.categoryScores).toHaveLength(6);
     expect(result.categoryScores.every((c) => c.score === 0)).toBe(true);
     expect(result.summary).toContain("Paste or record");
+    expect(result.speakers).toHaveLength(0);
   });
 
   it("scores a well-structured solar setter pitch across all 6 categories", () => {
@@ -75,5 +76,65 @@ describe("evaluatePitch", () => {
       ) / 10;
 
     expect(result.overallScore).toBe(expectedAvg);
+  });
+
+  it("identifies known speaker labels with full confidence", () => {
+    const pitch = [
+      "Setter: Hey, I'm here about your energy bills.",
+      "Homeowner: Okay, what about them?",
+    ].join("\n");
+
+    const result = evaluatePitch(pitch);
+
+    expect(result.speakers).toHaveLength(2);
+    const setter = result.speakers.find((s) => s.role === "setter");
+    const prospect = result.speakers.find((s) => s.role === "prospect");
+
+    expect(setter).toBeDefined();
+    expect(setter!.confidence).toBe(1.0);
+    expect(prospect).toBeDefined();
+    expect(prospect!.confidence).toBe(1.0);
+  });
+
+  it("classifies generic speaker labels by behavioral analysis", () => {
+    const pitch = [
+      "Speaker 1: Hey listen, I don't have much time. Do you see these powerlines here? They're going underground because of the storm outages. If we can get you the power you're using for significantly cheaper, we'll show you what it looks like. What's the lowest your bill gets?",
+      "Speaker 2: Yeah.",
+      "Speaker 2: $180 on the low end.",
+      "Speaker 2: No.",
+      "Speaker 1: Exactly. What I look at is the squiggly line on your bill. Does that make sense? Do you get this online or paper?",
+    ].join("\n");
+
+    const result = evaluatePitch(pitch);
+
+    expect(result.speakers).toHaveLength(2);
+    const setter = result.speakers.find((s) => s.role === "setter");
+    const prospect = result.speakers.find((s) => s.role === "prospect");
+
+    expect(setter).toBeDefined();
+    expect(setter!.label).toBe("Speaker 1");
+    expect(setter!.confidence).toBeGreaterThanOrEqual(0.5);
+
+    expect(prospect).toBeDefined();
+    expect(prospect!.label).toBe("Speaker 2");
+  });
+
+  it("classifies SPEAKER_00 / SPEAKER_01 format labels", () => {
+    const pitch = [
+      "SPEAKER_00: Yeah, our bill has definitely gone up. $220 in the summer.",
+      "SPEAKER_01: Got it. A lot of people around here are saying the same thing. If we can save you money, we'll show you exactly what it looks like. What does it spike to in the summer?",
+      "SPEAKER_00: My wife handles the bills but I think around $300.",
+    ].join("\n");
+
+    const result = evaluatePitch(pitch);
+
+    expect(result.speakers).toHaveLength(2);
+    const setter = result.speakers.find((s) => s.role === "setter");
+    const prospect = result.speakers.find((s) => s.role === "prospect");
+
+    expect(setter).toBeDefined();
+    expect(setter!.label).toBe("Speaker 01");
+    expect(prospect).toBeDefined();
+    expect(prospect!.label).toBe("Speaker 00");
   });
 });

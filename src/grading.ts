@@ -24,11 +24,21 @@ export type TranscriptMetrics = {
   avgWordsPerSentence: number;
 };
 
+export type SpeakerRole = "setter" | "prospect";
+
+export type SpeakerClassification = {
+  label: string;
+  role: SpeakerRole;
+  confidence: number;
+  signals: string[];
+};
+
 export type EvaluationResult = {
   overallScore: number;
   categoryScores: CategoryScore[];
   metrics: TranscriptMetrics;
   summary: string;
+  speakers: SpeakerClassification[];
 };
 
 const FILLER_WORDS = [
@@ -53,6 +63,9 @@ const SETTER_LABELS = [
   "caller",
   "sales",
   "representative",
+  "sales agent",
+  "telemarketer",
+  "seller",
 ];
 
 const PROSPECT_LABELS = [
@@ -65,6 +78,10 @@ const PROSPECT_LABELS = [
   "husband",
   "spouse",
   "person",
+  "lead",
+  "resident",
+  "recipient",
+  "owner",
 ];
 
 const OBJECTION_PATTERNS = [
@@ -338,6 +355,10 @@ const CLOSE_PATTERNS = [
   "online or paper",
 ];
 
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
 const normalize = (text: string): string =>
   text
     .toLowerCase()
@@ -398,40 +419,476 @@ const isOpenEndedQuestion = (question: string): boolean => {
 const clamp = (val: number, min: number, max: number): number =>
   Math.max(min, Math.min(max, val));
 
-const parseDialogue = (
-  transcript: string,
-): { setterText: string; prospectText: string; isDialogue: boolean } => {
+const formatLabel = (label: string): string =>
+  label
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+// ---------------------------------------------------------------------------
+// Speaker classification
+// ---------------------------------------------------------------------------
+
+type BehaviorAnalysis = {
+  setterScore: number;
+  homeownerScore: number;
+  setterSignals: string[];
+  homeownerSignals: string[];
+};
+
+function analyzeBehavior(lines: string[]): BehaviorAnalysis {
+  const text = lines.join(" ");
+  const norm = normalize(text);
+
+  let setterScore = 0;
+  let homeownerScore = 0;
+  const setterSignals: string[] = [];
+  const homeownerSignals: string[] = [];
+
+  // --- SETTER SIGNALS ---
+
+  const questions = getQuestions(text);
+  if (questions.length >= 3) {
+    setterScore += 3;
+    setterSignals.push("Asks multiple discovery questions");
+  } else if (questions.length >= 1) {
+    setterScore += 1;
+    setterSignals.push("Asks questions");
+  }
+
+  const pitchCount = countMatches(norm, [
+    "save",
+    "cheaper",
+    "lower",
+    "reduce",
+    "offer",
+    "program",
+    "benefit",
+    "solution",
+    "qualify",
+    "eligible",
+  ]);
+  if (pitchCount >= 2) {
+    setterScore += 2;
+    setterSignals.push("Uses sales/pitching language");
+  }
+
+  const serviceCount = countMatches(norm, [
+    "solar",
+    "roofing",
+    "hvac",
+    "windows",
+    "inspection",
+    "estimate",
+    "technician",
+    "panel",
+    "energy",
+    "net metering",
+    "utility",
+    "infrastructure",
+    "power lines",
+    "powerlines",
+  ]);
+  if (serviceCount >= 2) {
+    setterScore += 2;
+    setterSignals.push("References services or industry terms");
+  }
+
+  if (
+    hasAny(norm, [
+      "we can",
+      "we will",
+      "we offer",
+      "our company",
+      "our team",
+      "i work",
+      "we help",
+    ])
+  ) {
+    setterScore += 2;
+    setterSignals.push("Uses company-representative language");
+  }
+
+  if (
+    hasAny(norm, [
+      "schedule",
+      "appointment",
+      "available",
+      "when are you",
+      "book",
+      "calendar",
+      "walkthrough",
+    ])
+  ) {
+    setterScore += 2;
+    setterSignals.push("Uses booking/scheduling language");
+  }
+
+  const ackCount = countMatches(norm, ACKNOWLEDGE_PATTERNS);
+  const reframeCount = countMatches(norm, REFRAME_PATTERNS);
+  if (ackCount >= 2 || reframeCount >= 1) {
+    setterScore += 1;
+    setterSignals.push("Handles objections with acknowledgment");
+  }
+
+  if (
+    hasAny(norm, [
+      "real quick",
+      "before i",
+      "let me",
+      "what i look at",
+      "does that make sense",
+      "i stopped by",
+    ])
+  ) {
+    setterScore += 1;
+    setterSignals.push("Controls conversation flow");
+  }
+
+  if (
+    hasAny(norm, [
+      "don't have much time",
+      "dont have much time",
+      "hey listen",
+      "my name is",
+      "i'm calling",
+      "im calling",
+      "reason i'm here",
+      "reason im here",
+      "i stopped",
+    ])
+  ) {
+    setterScore += 2;
+    setterSignals.push("Uses introduction/opening pattern");
+  }
+
+  const avgWords =
+    lines.reduce((sum, l) => sum + getWords(l).length, 0) /
+    Math.max(lines.length, 1);
+  if (avgWords > 15) {
+    setterScore += 1;
+    setterSignals.push("Delivers longer, structured responses");
+  }
+
+  // --- HOMEOWNER SIGNALS ---
+
+  if (
+    hasAny(norm, [
+      "my bill",
+      "my roof",
+      "my house",
+      "our home",
+      "our bill",
+      "my power",
+      "our power",
+      "my energy",
+    ])
+  ) {
+    homeownerScore += 3;
+    homeownerSignals.push("References personal home or bills");
+  }
+
+  if (hasAny(norm, OBJECTION_PATTERNS)) {
+    homeownerScore += 2;
+    homeownerSignals.push("Expresses concerns or objections");
+  }
+
+  if (
+    hasAny(norm, [
+      "my husband",
+      "my wife",
+      "my spouse",
+      "busy right now",
+      "not home",
+      "come back later",
+      "kids",
+    ])
+  ) {
+    homeownerScore += 2;
+    homeownerSignals.push("References family or schedule");
+  }
+
+  if (/\$\d+/.test(text)) {
+    homeownerScore += 2;
+    homeownerSignals.push("States specific dollar amounts");
+  }
+
+  if (avgWords < 8 && lines.length >= 2) {
+    homeownerScore += 2;
+    homeownerSignals.push("Gives short, reactive responses");
+  }
+
+  const reactiveLines = lines.filter((l) =>
+    /^(yeah|yes|no|ok|okay|sure|right|nah|nope|hmm|huh)/i.test(l.trim()),
+  );
+  if (reactiveLines.length >= 2) {
+    homeownerScore += 2;
+    homeownerSignals.push("Uses frequent agreement/disagreement responses");
+  }
+
+  if (
+    hasAny(norm, [
+      "how much",
+      "what's the catch",
+      "whats the catch",
+      "is this legit",
+      "sounds like",
+      "are you sure",
+      "i don't know",
+      "i dont know",
+    ])
+  ) {
+    homeownerScore += 1;
+    homeownerSignals.push("Shows skepticism");
+  }
+
+  if (
+    hasAny(norm, [
+      "lost power",
+      "we lost",
+      "our roof",
+      "two days",
+      "been crazy",
+      "gone up",
+      "definitely",
+    ])
+  ) {
+    homeownerScore += 1;
+    homeownerSignals.push("Shares personal situation details");
+  }
+
+  return { setterScore, homeownerScore, setterSignals, homeownerSignals };
+}
+
+// ---------------------------------------------------------------------------
+// Dialogue parsing with speaker classification
+// ---------------------------------------------------------------------------
+
+type DialogueResult = {
+  setterText: string;
+  prospectText: string;
+  isDialogue: boolean;
+  speakers: SpeakerClassification[];
+};
+
+const parseDialogue = (transcript: string): DialogueResult => {
   const lines = transcript
     .split("\n")
     .map((l) => l.trim())
     .filter(Boolean);
 
-  const setterParts: string[] = [];
-  const prospectParts: string[] = [];
-  let dialogueDetected = false;
+  const speakerGroups = new Map<string, string[]>();
+  const originalLabels = new Map<string, string>();
 
   for (const line of lines) {
-    const match = line.match(/^([^:]{1,30}):\s*(.+)/);
+    const match = line.match(/^([^:]{1,40}):\s*(.+)/);
     if (match) {
-      const label = match[1].trim().toLowerCase();
+      const raw = match[1].trim();
+      const key = raw.toLowerCase();
       const text = match[2].trim();
 
-      if (SETTER_LABELS.some((l) => label.includes(l))) {
-        setterParts.push(text);
-        dialogueDetected = true;
-      } else if (PROSPECT_LABELS.some((l) => label.includes(l))) {
-        prospectParts.push(text);
-        dialogueDetected = true;
+      if (!speakerGroups.has(key)) {
+        speakerGroups.set(key, []);
+        originalLabels.set(key, raw);
       }
+      speakerGroups.get(key)!.push(text);
     }
   }
 
-  return {
-    setterText: setterParts.join(" "),
-    prospectText: prospectParts.join(" "),
-    isDialogue: dialogueDetected,
-  };
+  if (speakerGroups.size === 0) {
+    return { setterText: "", prospectText: "", isDialogue: false, speakers: [] };
+  }
+
+  // Check for known labels
+  let knownSetterKey: string | null = null;
+  let knownProspectKey: string | null = null;
+
+  for (const key of speakerGroups.keys()) {
+    if (SETTER_LABELS.some((l) => key.includes(l))) knownSetterKey = key;
+    if (PROSPECT_LABELS.some((l) => key.includes(l))) knownProspectKey = key;
+  }
+
+  // If both known labels exist, use them directly
+  if (knownSetterKey && knownProspectKey) {
+    const speakers: SpeakerClassification[] = [
+      {
+        label: formatLabel(originalLabels.get(knownSetterKey) ?? knownSetterKey),
+        role: "setter",
+        confidence: 1.0,
+        signals: ["Identified by speaker label"],
+      },
+      {
+        label: formatLabel(originalLabels.get(knownProspectKey) ?? knownProspectKey),
+        role: "prospect",
+        confidence: 1.0,
+        signals: ["Identified by speaker label"],
+      },
+    ];
+
+    return {
+      setterText: (speakerGroups.get(knownSetterKey) ?? []).join(" "),
+      prospectText: (speakerGroups.get(knownProspectKey) ?? []).join(" "),
+      isDialogue: true,
+      speakers,
+    };
+  }
+
+  // If one known label exists with 2 speakers, assign by elimination
+  if (speakerGroups.size === 2 && (knownSetterKey || knownProspectKey)) {
+    const keys = [...speakerGroups.keys()];
+    const otherKey = keys.find(
+      (k) => k !== knownSetterKey && k !== knownProspectKey,
+    )!;
+    const setterKey = knownSetterKey ?? otherKey;
+    const prospectKey = knownProspectKey ?? otherKey;
+
+    const speakers: SpeakerClassification[] = [
+      {
+        label: formatLabel(originalLabels.get(setterKey) ?? setterKey),
+        role: "setter",
+        confidence: knownSetterKey ? 1.0 : 0.85,
+        signals: knownSetterKey
+          ? ["Identified by speaker label"]
+          : ["Assigned by elimination (other speaker is labeled)"],
+      },
+      {
+        label: formatLabel(originalLabels.get(prospectKey) ?? prospectKey),
+        role: "prospect",
+        confidence: knownProspectKey ? 1.0 : 0.85,
+        signals: knownProspectKey
+          ? ["Identified by speaker label"]
+          : ["Assigned by elimination (other speaker is labeled)"],
+      },
+    ];
+
+    return {
+      setterText: (speakerGroups.get(setterKey) ?? []).join(" "),
+      prospectText: (speakerGroups.get(prospectKey) ?? []).join(" "),
+      isDialogue: true,
+      speakers,
+    };
+  }
+
+  // No known labels — run behavioral classification
+  if (speakerGroups.size === 2) {
+    return classifyTwoSpeakers(speakerGroups, originalLabels);
+  }
+
+  // Single or 3+ speakers — classify individually
+  return classifyMultipleSpeakers(speakerGroups, originalLabels);
 };
+
+function classifyTwoSpeakers(
+  groups: Map<string, string[]>,
+  originalLabels: Map<string, string>,
+): DialogueResult {
+  const entries = [...groups.entries()];
+  const [keyA, linesA] = entries[0];
+  const [keyB, linesB] = entries[1];
+
+  const analysisA = analyzeBehavior(linesA);
+  const analysisB = analyzeBehavior(linesB);
+
+  const diffA = analysisA.setterScore - analysisA.homeownerScore;
+  const diffB = analysisB.setterScore - analysisB.homeownerScore;
+
+  let setterKey: string;
+  let prospectKey: string;
+  let setterLines: string[];
+  let prospectLines: string[];
+  let setterAnalysis: BehaviorAnalysis;
+  let prospectAnalysis: BehaviorAnalysis;
+
+  if (diffA >= diffB) {
+    setterKey = keyA;
+    prospectKey = keyB;
+    setterLines = linesA;
+    prospectLines = linesB;
+    setterAnalysis = analysisA;
+    prospectAnalysis = analysisB;
+  } else {
+    setterKey = keyB;
+    prospectKey = keyA;
+    setterLines = linesB;
+    prospectLines = linesA;
+    setterAnalysis = analysisB;
+    prospectAnalysis = analysisA;
+  }
+
+  const separation = Math.abs(diffA - diffB);
+  const rawConfidence = Math.min(1, separation / 8);
+  const confidence =
+    Math.round(Math.max(rawConfidence, 0.5) * 100) / 100;
+
+  return {
+    setterText: setterLines.join(" "),
+    prospectText: prospectLines.join(" "),
+    isDialogue: true,
+    speakers: [
+      {
+        label: formatLabel(originalLabels.get(setterKey) ?? setterKey),
+        role: "setter",
+        confidence,
+        signals: setterAnalysis.setterSignals,
+      },
+      {
+        label: formatLabel(originalLabels.get(prospectKey) ?? prospectKey),
+        role: "prospect",
+        confidence,
+        signals: prospectAnalysis.homeownerSignals,
+      },
+    ],
+  };
+}
+
+function classifyMultipleSpeakers(
+  groups: Map<string, string[]>,
+  originalLabels: Map<string, string>,
+): DialogueResult {
+  const speakers: SpeakerClassification[] = [];
+  let setterText = "";
+  let prospectText = "";
+
+  for (const [key, lines] of groups) {
+    const analysis = analyzeBehavior(lines);
+    const isSetter = analysis.setterScore >= analysis.homeownerScore;
+    const total = analysis.setterScore + analysis.homeownerScore;
+    const confidence =
+      total > 0
+        ? Math.round(
+            (Math.abs(analysis.setterScore - analysis.homeownerScore) /
+              total) *
+              100,
+          ) / 100
+        : 0.5;
+
+    if (isSetter) {
+      setterText += (setterText ? " " : "") + lines.join(" ");
+    } else {
+      prospectText += (prospectText ? " " : "") + lines.join(" ");
+    }
+
+    speakers.push({
+      label: formatLabel(originalLabels.get(key) ?? key),
+      role: isSetter ? "setter" : "prospect",
+      confidence,
+      signals: isSetter
+        ? analysis.setterSignals
+        : analysis.homeownerSignals,
+    });
+  }
+
+  return {
+    setterText,
+    prospectText,
+    isDialogue: speakers.length > 0,
+    speakers,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Category scorers
+// ---------------------------------------------------------------------------
 
 function scoreObjectionHandling(
   transcript: string,
@@ -717,7 +1174,7 @@ function scoreValueProposition(
 
   const feedback =
     score >= 7
-      ? `Clear, outcome-focused value proposition with relevant specifics.`
+      ? "Clear, outcome-focused value proposition with relevant specifics."
       : score >= 5
         ? `Value proposition is present but ${weaknesses.length > 0 ? weaknesses[0].toLowerCase() : "could be stronger"}. Needs more prospect-specific framing.`
         : `Weak value proposition. ${weaknesses[0] || "No clear reason for the prospect to care"}.`;
@@ -1123,6 +1580,10 @@ function scoreStructureAdherence(
   };
 }
 
+// ---------------------------------------------------------------------------
+// Metrics
+// ---------------------------------------------------------------------------
+
 function computeMetrics(
   transcript: string,
   setterText: string,
@@ -1152,6 +1613,10 @@ function computeMetrics(
         : 0,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Summary
+// ---------------------------------------------------------------------------
 
 function buildSummary(
   overallScore: number,
@@ -1200,6 +1665,10 @@ function buildSummary(
   return summary;
 }
 
+// ---------------------------------------------------------------------------
+// Main evaluator
+// ---------------------------------------------------------------------------
+
 const emptyCategory = (
   id: CategoryId,
   name: string,
@@ -1237,10 +1706,12 @@ export const evaluatePitch = (transcript: string): EvaluationResult => {
       },
       summary:
         "Paste or record a pitch transcript to generate an evaluation.",
+      speakers: [],
     };
   }
 
-  const { setterText, prospectText } = parseDialogue(transcript);
+  const { setterText, prospectText, speakers } =
+    parseDialogue(transcript);
   const analysisText = setterText || transcript;
 
   const categoryScores = [
@@ -1266,5 +1737,5 @@ export const evaluatePitch = (transcript: string): EvaluationResult => {
   const metrics = computeMetrics(transcript, analysisText);
   const summary = buildSummary(overallScore, categoryScores, metrics);
 
-  return { overallScore, categoryScores, metrics, summary };
+  return { overallScore, categoryScores, metrics, summary, speakers };
 };

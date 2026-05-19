@@ -7,8 +7,13 @@ import {
   MicOff,
   Sparkles,
   Target,
+  Users,
 } from "lucide-react";
-import { evaluatePitch, CategoryScore } from "./grading";
+import {
+  evaluatePitch,
+  CategoryScore,
+  SpeakerClassification,
+} from "./grading";
 
 type SpeechRecognitionResultItem = {
   transcript: string;
@@ -267,6 +272,23 @@ const App = () => {
         </div>
 
         <div className="panel">
+          {evaluation.speakers.length > 0 && (
+            <div className="speaker-section">
+              <div className="panel-heading">
+                <div>
+                  <p className="eyebrow">
+                    <Users size={16} /> Speaker identification
+                  </p>
+                  <h2>Detected roles</h2>
+                </div>
+              </div>
+              <div className="speaker-cards">
+                {evaluation.speakers.map((speaker) => (
+                  <SpeakerCard key={speaker.label} speaker={speaker} />
+                ))}
+              </div>
+            </div>
+          )}
           <div className="panel-heading">
             <div>
               <p className="eyebrow">
@@ -388,6 +410,42 @@ const CategoryCard = ({ category }: CategoryCardProps) => (
       </div>
     )}
   </article>
+);
+
+type SpeakerCardProps = {
+  speaker: SpeakerClassification;
+};
+
+const SpeakerCard = ({ speaker }: SpeakerCardProps) => (
+  <div className={`speaker-card ${speaker.role}`}>
+    <div className="speaker-header">
+      <span className="speaker-name">{speaker.label}</span>
+      <span className={`speaker-role-badge ${speaker.role}`}>
+        {speaker.role === "setter" ? "Appointment Setter" : "Homeowner / Prospect"}
+      </span>
+    </div>
+    <div className="speaker-confidence">
+      <span className="confidence-label">Confidence</span>
+      <div className="confidence-bar-track">
+        <span
+          className={speaker.role}
+          style={{ width: `${speaker.confidence * 100}%` }}
+        />
+      </div>
+      <span className="confidence-value">
+        {Math.round(speaker.confidence * 100)}%
+      </span>
+    </div>
+    {speaker.signals.length > 0 && (
+      <div className="speaker-signals">
+        {speaker.signals.map((signal) => (
+          <span className="signal-chip" key={signal}>
+            {signal}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
 );
 
 export default App;

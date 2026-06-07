@@ -14,6 +14,13 @@ Then open:
 
 ## Permanent website address
 
-After GitHub Actions finishes deployment, the site is available at:
+Published site URL:
 
 `https://rvargas112902-ship-it.github.io/Solar-project/`
+
+One-time GitHub setting (owner action):
+
+1. Open repository Settings → Pages.
+2. Set Source to `Deploy from a branch`.
+3. Choose branch `gh-pages` and folder `/ (root)`.
+4. Save.

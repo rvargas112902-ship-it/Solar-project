@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Florida DMV Driver License Practice Test (50 Questions)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      padding: 24px;
+      background: #f7f9fc;
+      color: #1f2937;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    .meta {
+      background: #eef4ff;
+      border-left: 4px solid #2563eb;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    .question-card {
+      border: 1px solid #d6dde8;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+      background: #fcfdff;
+    }
+    .picture-prompt {
+      background: #fff8e7;
+      border: 1px dashed #e9b949;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .choices {
+      margin: 10px 0;
+      padding-left: 0;
+      list-style: none;
+    }
+    .choices li {
+      margin: 6px 0;
+    }
+    .answer-reveal {
+      margin-top: 10px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 10px;
+      display: none;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 24px 0;
+    }
+    button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: #475569;
+    }
+    #results {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 14px;
+      background: #f8fafc;
+      display: none;
+      margin-bottom: 20px;
+    }
+    .key-list {
+      columns: 2;
+      column-gap: 24px;
+      padding-left: 16px;
+    }
+    @media (max-width: 700px) {
+      .key-list {
+        columns: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Florida DMV Driver License Practice Test</h1>
+    <div class="meta">
+      <strong>Format:</strong> 50 multiple-choice questions (A-D), one correct answer each.<br />
+      <strong>Coverage:</strong> Florida road signs, signals, lane markings, right-of-way, speed limits, school zones, parking, DUI laws, crashes, insurance, licensing, and pedestrian/bicycle safety.<br />
+      <strong>Picture-Based Questions:</strong> 15 (using clear image prompts you can replace with generated images later).
+    </div>
+
+    <div id="questions"></div>
+
+    <div class="controls">
+      <button id="gradeBtn" type="button">Grade My Test</button>
+      <button id="showAnswersBtn" type="button" class="secondary">Show All Correct Answers</button>
+      <button id="resetBtn" type="button" class="secondary">Reset Test</button>
+    </div>
+
+    <div id="results"></div>
+
+    <h2>Full Answer Key (with Brief Explanations)</h2>
+    <ol id="answerKey" class="key-list"></ol>
+
+    <h2>Score Guide</h2>
+    <ul>
+      <li>40-50 correct: likely ready</li>
+      <li>30-39 correct: review weak areas</li>
+      <li>Below 30: study the Florida Driver License Handbook again</li>
+    </ul>
+
+    <h2>Topics to Review Based on Missed Questions</h2>
+    <p>
+      After you click <strong>Grade My Test</strong>, this page will list your missed-question topics (for example:
+      right-of-way, school bus rules, DUI/implied consent, no-fault insurance, or bicycle safety) so you know exactly what to study next.
+    </p>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        number: 1,
+        topic: "Road signs",
+        picturePrompt: "Florida-style red octagon STOP sign at a white stop line on a suburban street, clear daylight.",
+        text: "You approach this sign at an intersection. What must you do first?",
+        choices: {
+          A: "Come to a complete stop at the stop line or before entering the crosswalk/intersection.",
+          B: "Slow down and continue if no traffic is visible.",
+          C: "Honk and continue through.",
+          D: "Stop only if a pedestrian is present."
+        },
+        correct: "A",
+        explanation: "A STOP sign requires a full stop before proceeding when safe."
+      },
+      {
+        number: 2,
+        topic: "Road signs",
+        picturePrompt: "Red-and-white triangular YIELD sign at a roundabout entrance in Florida.",
+        text: "What does this sign mean?",
+        choices: {
+          A: "You have the right-of-way over all traffic.",
+          B: "Slow down and give right-of-way to traffic already in or approaching the intersection.",
+          C: "Stop every time before entering.",
+          D: "Only trucks must yield."
+        },
+        correct: "B",
+        explanation: "A YIELD sign means you must give right-of-way and proceed only when safe."
+      },
+      {
+        number: 3,
+        topic: "School zones and signs",
+        picturePrompt: "Fluorescent yellow-green pentagon school crossing sign with two pedestrians.",
+        text: "This sign warns that you are approaching:",
+        choices: {
+          A: "A hospital entrance.",
+          B: "A playground with no crossing.",
+          C: "A school area or school crossing where children may be present.",
+          D: "A railroad crossing."
+        },
+        correct: "C",
+        explanation: "The pentagon school sign warns drivers to watch for children and reduce speed as needed."
+      },
+      {
+        number: 4,
+        topic: "Road signs and lane markings",
+        picturePrompt: "Yellow pennant-shaped NO PASSING ZONE sign posted on the left side of a two-lane road.",
+        text: "What does this sign indicate?",
+        choices: {
+          A: "Passing is allowed for the next mile.",
+          B: "Only motorcycles may pass.",
+          C: "Passing is prohibited for all traffic in both directions.",
+          D: "Do not pass other vehicles in your lane in this zone."
+        },
+        correct: "D",
+        explanation: "The yellow pennant marks a no-passing zone for drivers in that direction."
+      },
+      {
+        number: 5,
+        topic: "Railroad crossings",
+        picturePrompt: "Railroad crossbuck sign with flashing red lights and lowered gate arm.",
+        text: "What is the correct action?",
+        choices: {
+          A: "Stop and wait until lights stop flashing and the gate is fully raised.",
+          B: "Drive around the gate if you do not see a train.",
+          C: "Proceed slowly without stopping.",
+          D: "Honk and continue."
+        },
+        correct: "A",
+        explanation: "Flashing red lights or a lowered gate mean stop and do not cross until safe."
+      },
+      {
+        number: 6,
+        topic: "Lane use",
+        picturePrompt: "Orange diamond lane-ends sign: RIGHT LANE ENDS MERGE LEFT.",
+        text: "What should you do when you see this sign?",
+        choices: {
+          A: "Speed up and stay in the ending lane.",
+          B: "Merge left safely before the lane ends.",
+          C: "Stop in your lane and wait.",
+          D: "Move onto the shoulder."
+        },
+        correct: "B",
+        explanation: "A lane-ends warning requires a safe merge into the continuing lane."
+      },
+      {
+        number: 7,
+        topic: "Traffic signals",
+        picturePrompt: "Traffic signal with a red left-turn arrow illuminated over a turn lane.",
+        text: "What does a steady red arrow mean?",
+        choices: {
+          A: "Turn left carefully after slowing.",
+          B: "You may turn right only.",
+          C: "Stop and do not turn in the direction of the arrow until a green indication appears.",
+          D: "Yield to oncoming traffic, then turn."
+        },
+        correct: "C",
+        explanation: "A steady red arrow means stop and remain stopped for that movement."
+      },
+      {
+        number: 8,
+        topic: "Traffic signals and turns",
+        picturePrompt: "Traffic signal with a flashing yellow left-turn arrow.",
+        text: "A flashing yellow left-turn arrow means:",
+        choices: {
+          A: "You may turn left after yielding to oncoming traffic and pedestrians.",
+          B: "Protected left turn only.",
+          C: "Stop before turning left.",
+          D: "No left turns allowed."
+        },
+        correct: "A",
+        explanation: "Flashing yellow arrow allows a cautious left turn after yielding."
+      },
+      {
+        number: 9,
+        topic: "Lane markings",
+        picturePrompt: "Center of roadway marked with two solid yellow lines.",
+        text: "What do double solid yellow lines mean?",
+        choices: {
+          A: "Passing is allowed in either direction.",
+          B: "Passing is allowed only during daylight.",
+          C: "Passing is allowed for left turns only.",
+          D: "No passing from either direction."
+        },
+        correct: "D",
+        explanation: "Double solid yellow center lines prohibit passing by traffic in both directions."
+      },
+      {
+        number: 10,
+        topic: "Lane markings",
+        picturePrompt: "White diamond pavement marking in a lane on a Florida urban roadway.",
+        text: "A white diamond symbol painted in your lane usually means:",
+        choices: {
+          A: "Road work ahead.",
+          B: "This lane is reserved for specific vehicles or purposes (such as HOV/transit).",
+          C: "No lane changes allowed.",
+          D: "School zone starts."
+        },
+        correct: "B",
+        explanation: "A white diamond often marks a preferential lane, such as HOV or transit use."
+      },
+      {
+        number: 11,
+        topic: "Bicycle safety and lane use",
+        picturePrompt: "Bike lane symbol with bicycle icon and solid white boundary line.",
+        text: "This pavement marking indicates:",
+        choices: {
+          A: "Motorcycles only.",
+          B: "Parking lane only.",
+          C: "A designated lane primarily for bicycle travel.",
+          D: "A right-turn-only lane."
+        },
+        correct: "C",
+        explanation: "Bike lane markings identify a designated lane for bicyclists."
+      },
+      {
+        number: 12,
+        topic: "Pedestrian safety",
+        picturePrompt: "Pedestrian signal showing flashing orange hand with countdown at a marked crosswalk.",
+        text: "What should a pedestrian do when this is flashing?",
+        choices: {
+          A: "Do not begin crossing; if already crossing, continue safely to the other side.",
+          B: "Start crossing quickly.",
+          C: "Ignore it if no cars are coming.",
+          D: "Wait in the middle of the street."
+        },
+        correct: "A",
+        explanation: "Flashing DON'T WALK means do not start crossing; finish crossing if already in crosswalk."
+      },
+      {
+        number: 13,
+        topic: "School bus rules",
+        picturePrompt: "Florida school bus stopped on a two-lane road with red lights flashing and stop arm extended.",
+        text: "On this road, what must drivers do?",
+        choices: {
+          A: "Only drivers behind the bus must stop.",
+          B: "Drivers in both directions must stop until the bus signal is withdrawn and children are clear.",
+          C: "Opposing traffic may continue at reduced speed.",
+          D: "Only trucks must stop."
+        },
+        correct: "B",
+        explanation: "On an undivided two-lane road, traffic in both directions must stop for a stopped school bus."
+      },
+      {
+        number: 14,
+        topic: "Parking rules",
+        picturePrompt: "Blue curb with wheelchair symbol and reserved parking sign in Florida parking lot.",
+        text: "What does this indicate?",
+        choices: {
+          A: "Loading zone for deliveries.",
+          B: "Passenger pickup zone.",
+          C: "Two-minute parking.",
+          D: "Parking reserved for persons with valid disabled parking authorization."
+        },
+        correct: "D",
+        explanation: "Blue-marked accessible spaces are reserved for drivers with proper disabled permits/plates."
+      },
+      {
+        number: 15,
+        topic: "Intersections and signs",
+        picturePrompt: "Roundabout warning sign and circular intersection with yield lines at entries.",
+        text: "At this intersection, you should:",
+        choices: {
+          A: "Enter quickly before circulating traffic.",
+          B: "Stop in the center island.",
+          C: "Yield to traffic already in the roundabout before entering.",
+          D: "Drive clockwise around the circle."
+        },
+        correct: "C",
+        explanation: "Roundabouts require entering traffic to yield to vehicles already circulating."
+      },
+      {
+        number: 16,
+        topic: "Right-of-way",
+        text: "At a four-way stop, two vehicles arrive at the same time. Who goes first?",
+        choices: {
+          A: "The vehicle on the right.",
+          B: "The larger vehicle.",
+          C: "The vehicle on the left.",
+          D: "Whoever honks first."
+        },
+        correct: "A",
+        explanation: "If two vehicles stop at the same time, the driver on the left yields to the driver on the right."
+      },
+      {
+        number: 17,
+        topic: "Right-of-way",
+        text: "When entering a road from a driveway, alley, or private road, you must:",
+        choices: {
+          A: "Enter first, then signal.",
+          B: "Speed up to merge without yielding.",
+          C: "Yield to all vehicles and pedestrians already on the roadway or sidewalk.",
+          D: "Honk to claim right-of-way."
+        },
+        correct: "C",
+        explanation: "Drivers entering from private property must yield to roadway traffic and pedestrians."
+      },
+      {
+        number: 18,
+        topic: "Emergency vehicles",
+        text: "An emergency vehicle with siren and flashing lights approaches from behind. You should:",
+        choices: {
+          A: "Maintain speed and stay in your lane.",
+          B: "Move to the nearest curb or edge of roadway and stop until it passes.",
+          C: "Stop in the middle of the intersection.",
+          D: "Race to the next intersection first."
+        },
+        correct: "B",
+        explanation: "Florida law requires drivers to yield by pulling over and stopping for approaching emergency vehicles."
+      },
+      {
+        number: 19,
+        topic: "Move Over law",
+        text: "Under Florida's Move Over law, when approaching a stopped emergency or service vehicle with flashing lights, you should:",
+        choices: {
+          A: "Keep speed and stay in lane.",
+          B: "Honk and pass quickly.",
+          C: "Move over one lane if safe, or if not possible, slow substantially below the posted speed.",
+          D: "Stop in your lane regardless of traffic."
+        },
+        correct: "C",
+        explanation: "Florida requires moving over when possible; otherwise reduce speed for safety."
+      },
+      {
+        number: 20,
+        topic: "Speed limits and school zones",
+        text: "What is the standard Florida school zone speed limit unless otherwise posted?",
+        choices: {
+          A: "20 MPH",
+          B: "25 MPH",
+          C: "30 MPH",
+          D: "35 MPH"
+        },
+        correct: "A",
+        explanation: "Florida's standard school zone speed limit is 20 MPH unless posted otherwise."
+      },
+      {
+        number: 21,
+        topic: "Speed limits",
+        text: "In a municipal, business, or residential area, the standard maximum speed is generally:",
+        choices: {
+          A: "20 MPH",
+          B: "30 MPH",
+          C: "45 MPH",
+          D: "55 MPH"
+        },
+        correct: "B",
+        explanation: "Florida standard municipal/business/residential maximum speed is 30 MPH unless posted otherwise."
+      },
+      {
+        number: 22,
+        topic: "Speed limits",
+        text: "The maximum speed limit on many Florida limited-access highways is:",
+        choices: {
+          A: "55 MPH",
+          B: "60 MPH",
+          C: "65 MPH",
+          D: "70 MPH"
+        },
+        correct: "D",
+        explanation: "Limited-access highways in Florida may be posted up to 70 MPH."
+      },
+      {
+        number: 23,
+        topic: "Speed management",
+        text: "Which statement is true about slow driving in Florida?",
+        choices: {
+          A: "Driving very slowly is always safer and always legal.",
+          B: "You may block traffic if you are uncomfortable.",
+          C: "Driving too slowly and blocking normal traffic flow can be a violation.",
+          D: "Minimum speed signs are only suggestions."
+        },
+        correct: "C",
+        explanation: "Drivers must not unreasonably impede normal traffic flow."
+      },
+      {
+        number: 24,
+        topic: "School bus rules",
+        text: "A school bus stops with red lights flashing on the other side of a divided highway with a raised median. What should you do?",
+        choices: {
+          A: "You do not have to stop when traveling on the opposite side of a divided highway.",
+          B: "You must always stop regardless of median.",
+          C: "You should stop only if children are visible.",
+          D: "You may pass at 10 MPH."
+        },
+        correct: "A",
+        explanation: "On the opposite side of a divided highway, traffic does not stop for the bus."
+      },
+      {
+        number: 25,
+        topic: "Parking rules",
+        text: "How close may you park to a fire hydrant?",
+        choices: {
+          A: "5 feet",
+          B: "Not within 15 feet",
+          C: "Not within 25 feet",
+          D: "Not within 30 feet"
+        },
+        correct: "B",
+        explanation: "Florida parking rules prohibit parking within 15 feet of a fire hydrant."
+      },
+      {
+        number: 26,
+        topic: "Parking rules",
+        text: "Florida law generally prohibits parking within how many feet of a stop sign or traffic signal?",
+        choices: {
+          A: "10 feet",
+          B: "15 feet",
+          C: "20 feet",
+          D: "30 feet"
+        },
+        correct: "D",
+        explanation: "Do not park within 30 feet of traffic control signals or signs."
+      },
+      {
+        number: 27,
+        topic: "Parking rules",
+        text: "If you must stop on a highway outside business or residential districts, where should your vehicle be?",
+        choices: {
+          A: "Partly in the travel lane.",
+          B: "As far off the paved portion as possible.",
+          C: "In the center of the roadway.",
+          D: "Blocking the shoulder."
+        },
+        correct: "B",
+        explanation: "A stopped vehicle should be moved off the pavement whenever possible."
+      },
+      {
+        number: 28,
+        topic: "DUI laws",
+        text: "In Florida, you can be charged with DUI if your blood/breath alcohol level is:",
+        choices: {
+          A: "0.08 or higher",
+          B: "0.05 or higher",
+          C: "0.10 or higher",
+          D: "0.15 only"
+        },
+        correct: "A",
+        explanation: "A BAL of 0.08 or higher meets the per se DUI threshold."
+      },
+      {
+        number: 29,
+        topic: "DUI laws (under 21)",
+        text: "For drivers under 21, a BAL of _____ or higher can trigger an administrative suspension.",
+        choices: {
+          A: "0.08",
+          B: "0.05",
+          C: "0.02",
+          D: "0.01"
+        },
+        correct: "C",
+        explanation: "Florida's zero-tolerance rule for under-21 drivers uses a 0.02 BAL threshold."
+      },
+      {
+        number: 30,
+        topic: "Implied consent",
+        text: "Under Florida's implied consent law, a first refusal to submit to a lawful breath/urine/blood test generally results in:",
+        choices: {
+          A: "A warning only",
+          B: "A one-year license suspension",
+          C: "A 30-day suspension only",
+          D: "No consequence unless convicted of DUI"
+        },
+        correct: "B",
+        explanation: "A first refusal triggers an automatic one-year license suspension."
+      },
+      {
+        number: 31,
+        topic: "Implied consent",
+        text: "A second refusal to submit to a lawful DUI chemical test in Florida results in:",
+        choices: {
+          A: "No additional penalty",
+          B: "A six-month suspension only",
+          C: "A warning and fine only",
+          D: "An 18-month suspension and additional criminal penalties"
+        },
+        correct: "D",
+        explanation: "A second refusal carries harsher penalties, including longer suspension and criminal consequences."
+      },
+      {
+        number: 32,
+        topic: "Crashes",
+        text: "If you are involved in a crash with injuries, what is required?",
+        choices: {
+          A: "Stop, render reasonable aid, and notify law enforcement/911.",
+          B: "Leave if the vehicles can still move.",
+          C: "Exchange names only and leave.",
+          D: "Wait until the next day to report."
+        },
+        correct: "A",
+        explanation: "Injury crashes require stopping, helping, and notifying authorities."
+      },
+      {
+        number: 33,
+        topic: "Crashes",
+        text: "In a minor crash with no injuries and drivable vehicles, you should:",
+        choices: {
+          A: "Leave vehicles in travel lanes for police to inspect.",
+          B: "Block traffic to preserve the scene.",
+          C: "Move vehicles out of traffic lanes if possible.",
+          D: "Drive away without exchanging information."
+        },
+        correct: "C",
+        explanation: "Move drivable vehicles out of travel lanes to reduce additional crash risk."
+      },
+      {
+        number: 34,
+        topic: "Crashes",
+        text: "If you damage an unattended vehicle, you must:",
+        choices: {
+          A: "Leave without reporting if damage seems small.",
+          B: "Wait no more than one minute, then leave.",
+          C: "Only call your insurance company.",
+          D: "Locate the owner or leave identifying information in a secure note and report when required."
+        },
+        correct: "D",
+        explanation: "Florida requires identification and proper notification when an unattended vehicle is damaged."
+      },
+      {
+        number: 35,
+        topic: "Insurance laws",
+        text: "Florida's minimum required auto insurance for most 4-wheel vehicles is:",
+        choices: {
+          A: "$25,000 bodily injury and $10,000 collision",
+          B: "$10,000 collision and $10,000 comprehensive",
+          C: "$50,000 PIP and $50,000 PDL",
+          D: "$10,000 PIP and $10,000 PDL"
+        },
+        correct: "D",
+        explanation: "Florida no-fault law requires at least $10,000 PIP and $10,000 PDL."
+      },
+      {
+        number: 36,
+        topic: "Insurance laws",
+        text: "What is a key feature of Florida PIP (Personal Injury Protection)?",
+        choices: {
+          A: "It helps cover your injury costs regardless of who caused the crash.",
+          B: "It only pays if the other driver is uninsured.",
+          C: "It replaces all required liability coverage.",
+          D: "It covers vehicle theft."
+        },
+        correct: "A",
+        explanation: "PIP is no-fault coverage for your own qualifying injury expenses."
+      },
+      {
+        number: 37,
+        topic: "Licensing rules",
+        text: "At what minimum age can you apply for a Florida learner license?",
+        choices: {
+          A: "14",
+          B: "15",
+          C: "16",
+          D: "17"
+        },
+        correct: "B",
+        explanation: "A learner license may be issued at age 15 in Florida."
+      },
+      {
+        number: 38,
+        topic: "Licensing rules",
+        text: "During the first 3 months after receiving a Florida learner license, driving is generally limited to:",
+        choices: {
+          A: "Any time with passengers.",
+          B: "Daylight hours only.",
+          C: "Nighttime only.",
+          D: "Highways only."
+        },
+        correct: "B",
+        explanation: "Florida learner-license holders are limited to daytime driving for the first 3 months."
+      },
+      {
+        number: 39,
+        topic: "Licensing rules",
+        text: "After the first 3 months with a learner license (until age 18), when may you drive?",
+        choices: {
+          A: "Until 10 PM with a licensed driver age 21 or older in the front passenger seat.",
+          B: "Any time alone if you stay local.",
+          C: "Only to school events.",
+          D: "Only between 10 PM and 6 AM."
+        },
+        correct: "A",
+        explanation: "Learner drivers may drive until 10 PM with the required supervising licensed adult."
+      },
+      {
+        number: 40,
+        topic: "Licensing rules",
+        text: "To pass Florida's Class E knowledge exam, you generally need at least:",
+        choices: {
+          A: "60% correct",
+          B: "70% correct",
+          C: "75% correct",
+          D: "80% correct"
+        },
+        correct: "D",
+        explanation: "The standard passing score is 80% (40 out of 50)."
+      },
+      {
+        number: 41,
+        topic: "Occupant safety",
+        text: "Which statement about seat belts in Florida is correct?",
+        choices: {
+          A: "Only drivers under 18 must wear seat belts.",
+          B: "Seat belts are optional in front seats.",
+          C: "Children under 18 must be restrained, and front-seat occupants must wear seat belts.",
+          D: "Seat belts are required only on highways."
+        },
+        correct: "C",
+        explanation: "Florida law requires restraints for minors and seat belt use in front seats."
+      },
+      {
+        number: 42,
+        topic: "Child restraint rules",
+        text: "Florida child restraint law requires children age 5 and under to:",
+        choices: {
+          A: "Use only a regular adult shoulder belt.",
+          B: "Be properly restrained in child-restraint systems appropriate for age/size (with stricter requirements for younger children).",
+          C: "Sit in the front seat if in a booster.",
+          D: "Ride unrestrained in low-speed neighborhoods."
+        },
+        correct: "B",
+        explanation: "Children age 5 and under must use proper child-restraint equipment."
+      },
+      {
+        number: 43,
+        topic: "Motorcycle rules",
+        text: "A Florida motorcycle operator age 21 or older may ride without a helmet only if they:",
+        choices: {
+          A: "Have had a motorcycle license for two years.",
+          B: "Carry at least $10,000 in medical benefits coverage.",
+          C: "Ride only during daylight.",
+          D: "Stay below 35 MPH."
+        },
+        correct: "B",
+        explanation: "Helmet exemption for riders 21+ requires at least $10,000 medical benefits coverage."
+      },
+      {
+        number: 44,
+        topic: "Bicycle safety",
+        text: "In Florida, bicyclists on public roads are generally required to:",
+        choices: {
+          A: "Ride against traffic for visibility.",
+          B: "Ignore traffic control devices.",
+          C: "Use sidewalks at all times.",
+          D: "Follow the same traffic laws and signs that apply to drivers."
+        },
+        correct: "D",
+        explanation: "Bicyclists are vehicle operators and must obey traffic laws."
+      },
+      {
+        number: 45,
+        topic: "Bicycle safety",
+        text: "When passing a bicycle, Florida drivers should leave at least:",
+        choices: {
+          A: "1 foot",
+          B: "3 feet",
+          C: "5 feet",
+          D: "10 feet"
+        },
+        correct: "B",
+        explanation: "Florida law requires at least 3 feet of clearance when passing a bicycle."
+      },
+      {
+        number: 46,
+        topic: "Pedestrian safety",
+        text: "A pedestrian with a white cane or guide dog is crossing. You must:",
+        choices: {
+          A: "Proceed if your light is green.",
+          B: "Yield only if the pedestrian is in your lane.",
+          C: "Come to a complete stop and yield.",
+          D: "Honk to alert them and continue."
+        },
+        correct: "C",
+        explanation: "Drivers must yield and stop for blind pedestrians using a white cane or guide dog."
+      },
+      {
+        number: 47,
+        topic: "Pedestrian right-of-way",
+        text: "At intersections, drivers must yield to pedestrians:",
+        choices: {
+          A: "In marked crosswalks and also in unmarked crosswalks at intersections.",
+          B: "Only if crossing with a group.",
+          C: "Only in school zones.",
+          D: "Only when a crossing guard is present."
+        },
+        correct: "A",
+        explanation: "Pedestrian right-of-way applies in both marked and unmarked crosswalks at intersections."
+      },
+      {
+        number: 48,
+        topic: "Defensive driving",
+        text: "A common Florida handbook recommendation for normal following distance is:",
+        choices: {
+          A: "1 second",
+          B: "2 seconds",
+          C: "Exactly 5 seconds in all conditions",
+          D: "At least 3 to 4 seconds, with more time in poor conditions"
+        },
+        correct: "D",
+        explanation: "A 3-4 second minimum following interval is commonly recommended, increasing for hazards."
+      },
+      {
+        number: 49,
+        topic: "Defensive driving and skids",
+        text: "If your car begins to skid, you should first:",
+        choices: {
+          A: "Slam on the brakes immediately.",
+          B: "Steer in the direction you want the front wheels to go and avoid sudden braking.",
+          C: "Turn the wheel sharply in the opposite direction.",
+          D: "Accelerate hard."
+        },
+        correct: "B",
+        explanation: "Controlled steering and avoiding panic braking helps recover from many skids."
+      },
+      {
+        number: 50,
+        topic: "Defensive driving and emergencies",
+        text: "If a tire blows out while driving, what is the best response?",
+        choices: {
+          A: "Brake hard immediately.",
+          B: "Turn sharply toward the shoulder.",
+          C: "Hold steering firmly, ease off the accelerator, and brake gently after regaining control.",
+          D: "Shift into park."
+        },
+        correct: "C",
+        explanation: "Maintain control first, then slow down gradually and move to a safe place."
+      }
+    ];
+
+    const questionContainer = document.getElementById("questions");
+    const answerKey = document.getElementById("answerKey");
+    const results = document.getElementById("results");
+
+    function renderQuestions() {
+      const html = questions.map((q) => {
+        const choices = Object.entries(q.choices).map(([letter, text]) => {
+          return `
+            <li>
+              <label>
+                <input type="radio" name="q${q.number}" value="${letter}" />
+                <strong>${letter}.</strong> ${text}
+              </label>
+            </li>
+          `;
+        }).join("");
+
+        const pictureBlock = q.picturePrompt
+          ? `<div class="picture-prompt"><strong>Image prompt:</strong> ${q.picturePrompt}</div>`
+          : "";
+
+        return `
+          <section class="question-card" id="question-${q.number}">
+            <h3>Question ${q.number}:</h3>
+            ${pictureBlock}
+            <p>${q.text}</p>
+            <ul class="choices">${choices}</ul>
+            <div class="answer-reveal" id="answer-${q.number}">
+              <p><strong>Correct answer:</strong> ${q.correct}</p>
+              <p><strong>Explanation:</strong> ${q.explanation}</p>
+            </div>
+          </section>
+        `;
+      }).join("");
+
+      questionContainer.innerHTML = html;
+    }
+
+    function renderAnswerKey() {
+      const html = questions.map((q) => {
+        return `<li><strong>${q.number}. ${q.correct}</strong> - ${q.explanation}</li>`;
+      }).join("");
+      answerKey.innerHTML = html;
+    }
+
+    function gradeTest() {
+      let correctCount = 0;
+      const missed = [];
+
+      questions.forEach((q) => {
+        const selected = document.querySelector(`input[name="q${q.number}"]:checked`);
+        const userAnswer = selected ? selected.value : null;
+        if (userAnswer === q.correct) {
+          correctCount += 1;
+        } else {
+          missed.push(q);
+        }
+      });
+
+      let readiness = "";
+      if (correctCount >= 40) readiness = "likely ready";
+      else if (correctCount >= 30) readiness = "review weak areas";
+      else readiness = "study the Florida Driver License Handbook again";
+
+      const uniqueTopics = [...new Set(missed.map((m) => m.topic))];
+      const missedList = missed.length
+        ? missed.map((m) => `<li>Question ${m.number}: ${m.topic}</li>`).join("")
+        : "<li>No missed questions. Great work.</li>";
+      const topicList = uniqueTopics.length
+        ? uniqueTopics.map((t) => `<li>${t}</li>`).join("")
+        : "<li>No additional review topics needed.</li>";
+
+      results.style.display = "block";
+      results.innerHTML = `
+        <h3>Your Score: ${correctCount}/50</h3>
+        <p><strong>Score guide result:</strong> ${readiness}</p>
+        <h4>Missed Questions</h4>
+        <ul>${missedList}</ul>
+        <h4>Topics You Should Review Based on Missed Questions</h4>
+        <ul>${topicList}</ul>
+      `;
+
+      window.scrollTo({ top: results.offsetTop - 20, behavior: "smooth" });
+    }
+
+    function showAllAnswers() {
+      questions.forEach((q) => {
+        const box = document.getElementById(`answer-${q.number}`);
+        box.style.display = "block";
+      });
+    }
+
+    function resetTest() {
+      document.querySelectorAll("input[type='radio']").forEach((input) => { input.checked = false; });
+      document.querySelectorAll(".answer-reveal").forEach((box) => { box.style.display = "none"; });
+      results.style.display = "none";
+      results.innerHTML = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    renderQuestions();
+    renderAnswerKey();
+    document.getElementById("gradeBtn").addEventListener("click", gradeTest);
+    document.getElementById("showAnswersBtn").addEventListener("click", showAllAnswers);
+    document.getElementById("resetBtn").addEventListener("click", resetTest);
+  </script>
+</body>
+</html>

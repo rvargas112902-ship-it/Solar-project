@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Florida DMV Driver License Practice Test (50 Questions)</title>
+    <meta
+      name="description"
+      content="Free interactive Florida DMV driver license practice test with 50 multiple-choice questions, road sign images, instant scoring, explanations, and a study guide based on the official Florida Driver License Handbook."
+    />
+    <style>
+      :root {
+        --fl-blue: #0b3d91;
+        --fl-blue-dark: #082a66;
+        --fl-orange: #ff7a00;
+        --green: #1e8e3e;
+        --green-soft: #e6f4ea;
+        --red: #d93025;
+        --red-soft: #fce8e6;
+        --ink: #1c2430;
+        --muted: #5b6675;
+        --line: #e3e8ef;
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --shadow: 0 10px 30px rgba(11, 61, 145, 0.08);
+        --radius: 16px;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.55;
+      }
+      .wrap { max-width: 860px; margin: 0 auto; padding: 0 18px; }
+
+      /* Header / hero */
+      .hero {
+        background: linear-gradient(135deg, var(--fl-blue), var(--fl-blue-dark));
+        color: #fff;
+        padding: 40px 0 56px;
+        text-align: center;
+      }
+      .badge {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+      .hero h1 { margin: 0 0 10px; font-size: clamp(26px, 5vw, 40px); line-height: 1.15; }
+      .hero p { margin: 0 auto; max-width: 620px; color: #dbe6ff; font-size: 16px; }
+      .hero-stats { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
+      .hero-stats div { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 18px; min-width: 120px; }
+      .hero-stats strong { display: block; font-size: 22px; }
+      .hero-stats span { font-size: 12px; color: #cdddff; text-transform: uppercase; letter-spacing: 0.05em; }
+
+      /* Sticky progress */
+      .progress-bar {
+        position: sticky; top: 0; z-index: 50;
+        background: var(--card);
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      }
+      .progress-inner {
+        display: flex; align-items: center; gap: 14px;
+        padding: 12px 18px; max-width: 860px; margin: 0 auto;
+      }
+      .track { flex: 1; height: 10px; background: #e7edf6; border-radius: 999px; overflow: hidden; }
+      .track > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--fl-orange), #ffac4d); transition: width .25s ease; }
+      .progress-label { font-size: 13px; color: var(--muted); white-space: nowrap; font-weight: 600; }
+
+      main { padding: 28px 0 60px; }
+
+      .intro-card {
+        background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 22px; margin: -36px auto 26px; box-shadow: var(--shadow); position: relative;
+      }
+      .intro-card h2 { margin: 0 0 8px; font-size: 19px; }
+      .intro-card ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); font-size: 14px; }
+
+      .q-card {
+        background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 22px; margin-bottom: 18px; box-shadow: var(--shadow); scroll-margin-top: 70px;
+      }
+      .q-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+      .q-num { background: var(--fl-blue); color: #fff; font-weight: 700; font-size: 13px; padding: 4px 10px; border-radius: 999px; }
+      .q-topic { background: #eef3fb; color: var(--fl-blue); font-size: 12px; padding: 4px 10px; border-radius: 999px; font-weight: 600; }
+      .q-text { font-size: 17px; font-weight: 600; margin: 6px 0 14px; }
+
+      .q-image { display: flex; justify-content: center; margin: 4px 0 16px; }
+      .q-image svg { width: 100%; max-width: 280px; height: auto; border-radius: 12px; background: #fff; border: 1px solid var(--line); padding: 10px; }
+
+      .choices { display: grid; gap: 10px; }
+      .choice {
+        display: flex; align-items: center; gap: 12px;
+        border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px;
+        cursor: pointer; transition: all .15s ease; background: #fff; font-size: 15px;
+      }
+      .choice:hover { border-color: var(--fl-blue); background: #f7faff; }
+      .choice input { display: none; }
+      .choice .letter {
+        flex: none; width: 28px; height: 28px; border-radius: 50%;
+        border: 2px solid var(--line); display: grid; place-items: center;
+        font-weight: 700; font-size: 13px; color: var(--muted); transition: all .15s ease;
+      }
+      .choice.selected { border-color: var(--fl-blue); background: #eef4ff; }
+      .choice.selected .letter { background: var(--fl-blue); border-color: var(--fl-blue); color: #fff; }
+
+      /* Graded states */
+      .choice.correct { border-color: var(--green); background: var(--green-soft); }
+      .choice.correct .letter { background: var(--green); border-color: var(--green); color: #fff; }
+      .choice.incorrect { border-color: var(--red); background: var(--red-soft); }
+      .choice.incorrect .letter { background: var(--red); border-color: var(--red); color: #fff; }
+      .choice.locked { cursor: default; }
+      .choice.locked:hover { background: inherit; }
+
+      .explain {
+        margin-top: 14px; border-left: 4px solid var(--fl-blue);
+        background: #f3f7ff; padding: 12px 14px; border-radius: 0 10px 10px 0; font-size: 14px; display: none;
+      }
+      .explain.show { display: block; }
+      .explain b { color: var(--fl-blue-dark); }
+      .explain.miss { border-left-color: var(--red); background: var(--red-soft); }
+      .explain.miss b { color: var(--red); }
+
+      .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 26px 0; }
+      .btn {
+        border: none; border-radius: 12px; padding: 14px 26px; font-size: 16px; font-weight: 700;
+        cursor: pointer; transition: transform .12s ease, box-shadow .12s ease;
+      }
+      .btn:active { transform: translateY(1px); }
+      .btn-primary { background: var(--fl-orange); color: #fff; box-shadow: 0 8px 20px rgba(255,122,0,0.3); }
+      .btn-primary:hover { background: #e96f00; }
+      .btn-ghost { background: #fff; color: var(--fl-blue); border: 1.5px solid var(--fl-blue); }
+      .btn-ghost:hover { background: #eef4ff; }
+
+      /* Results */
+      .results { display: none; }
+      .results.show { display: block; }
+      .score-card {
+        background: var(--card); border-radius: var(--radius); padding: 26px; text-align: center;
+        box-shadow: var(--shadow); border: 1px solid var(--line); margin-bottom: 22px;
+      }
+      .ring { width: 150px; height: 150px; margin: 6px auto 14px; position: relative; }
+      .ring svg { transform: rotate(-90deg); }
+      .ring .val { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+      .ring .val strong { font-size: 34px; line-height: 1; }
+      .ring .val span { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+      .verdict { font-size: 20px; font-weight: 800; margin: 6px 0 2px; }
+      .verdict.pass { color: var(--green); }
+      .verdict.warn { color: var(--fl-orange); }
+      .verdict.fail { color: var(--red); }
+
+      .guide { text-align: left; background: #f7faff; border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-top: 18px; }
+      .guide h3 { margin: 0 0 10px; font-size: 15px; }
+      .guide .row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+      .guide .row:last-child { border-bottom: none; }
+      .guide .row.active { font-weight: 800; color: var(--fl-blue); }
+
+      .review-box { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 22px; }
+      .review-box h3 { margin: 0 0 12px; font-size: 17px; }
+      .review-box.empty p { color: var(--green); font-weight: 600; }
+      .topic-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--red-soft); color: var(--red); border-radius: 999px; padding: 6px 14px; margin: 4px 6px 4px 0; font-size: 14px; font-weight: 600; }
+      .topic-chip b { background: var(--red); color: #fff; border-radius: 999px; padding: 0 8px; font-size: 12px; }
+
+      footer { text-align: center; color: var(--muted); font-size: 13px; padding: 24px 18px 40px; }
+      footer a { color: var(--fl-blue); }
+
+      .toast {
+        position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+        background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 10px;
+        font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s ease; z-index: 100;
+      }
+      .toast.show { opacity: 1; }
+
+      @media (max-width: 560px) {
+        .q-text { font-size: 16px; }
+        .hero-stats div { min-width: 90px; padding: 10px 12px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="wrap">
+        <span class="badge">Official Handbook Based · 2024–2025</span>
+        <h1>Florida DMV Driver License Practice Test</h1>
+        <p>
+          50 multiple-choice questions covering road signs, right-of-way, DUI laws, insurance,
+          school zones, and more — modeled on the real Florida written knowledge exam.
+        </p>
+        <div class="hero-stats">
+          <div><strong>50</strong><span>Questions</span></div>
+          <div><strong>20</strong><span>With Images</span></div>
+          <div><strong>40+</strong><span>To Pass</span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="progress-bar">
+      <div class="progress-inner">
+        <span class="progress-label" id="progressLabel">0 / 50 answered</span>
+        <div class="track"><i id="progressFill"></i></div>
+      </div>
+    </div>
+
+    <main>
+      <div class="wrap">
+        <div class="intro-card">
+          <h2>How this test works</h2>
+          <ul>
+            <li>Pick one answer (A–D) for each of the 50 questions.</li>
+            <li>Click <b>Submit &amp; Score My Test</b> to grade everything at once.</li>
+            <li>You'll get your score, a pass/fail verdict, full explanations, and a personalized list of topics to review.</li>
+            <li>The real Florida Class E exam has 50 questions and you must answer at least <b>40 (80%)</b> correctly to pass.</li>
+          </ul>
+        </div>
+
+        <form id="quiz"></form>
+
+        <div class="actions" id="mainActions">
+          <button type="button" class="btn btn-primary" id="submitBtn">Submit &amp; Score My Test</button>
+        </div>
+
+        <section class="results" id="results">
+          <div class="score-card">
+            <div class="ring">
+              <svg width="150" height="150" viewBox="0 0 150 150">
+                <circle cx="75" cy="75" r="66" fill="none" stroke="#e7edf6" stroke-width="14" />
+                <circle id="ringProgress" cx="75" cy="75" r="66" fill="none" stroke="#1e8e3e" stroke-width="14" stroke-linecap="round" stroke-dasharray="414.7" stroke-dashoffset="414.7" />
+              </svg>
+              <div class="val"><strong id="scoreNum">0</strong><span>out of 50</span></div>
+            </div>
+            <div class="verdict" id="verdict"></div>
+            <p id="verdictMsg" style="margin:4px 0 0;color:var(--muted)"></p>
+
+            <div class="guide">
+              <h3>Score Guide</h3>
+              <div class="row" data-band="pass"><span>40–50 correct</span><span>Likely ready for the exam ✅</span></div>
+              <div class="row" data-band="warn"><span>30–39 correct</span><span>Review your weak areas ✏️</span></div>
+              <div class="row" data-band="fail"><span>Below 30 correct</span><span>Study the Florida Handbook again 📖</span></div>
+            </div>
+          </div>
+
+          <div class="review-box" id="topicReview">
+            <h3>Topics to review</h3>
+            <div id="topicChips"></div>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn btn-ghost" id="reviewBtn">See Correct Answers</button>
+            <button type="button" class="btn btn-primary" id="retakeBtn">Retake Test</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <p>
+          Practice tool for study only. Always confirm current rules with the official
+          <a href="https://www.flhsmv.gov/handbooks-manuals/" target="_blank" rel="noopener">Florida Driver License Handbook (FLHSMV)</a>.
+        </p>
+      </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      /* ------------------------------------------------------------------ */
+      /*  Reusable Florida-style sign / scene images (inline SVG)            */
+      /* ------------------------------------------------------------------ */
+      const SVG = {
+        stop: `<svg viewBox="0 0 200 200" role="img" aria-label="Red octagon stop sign"><polygon points="60,12 140,12 188,60 188,140 140,188 60,188 12,140 12,60" fill="#c1272d" stroke="#fff" stroke-width="6"/><text x="100" y="118" font-size="46" font-family="Arial" font-weight="bold" fill="#fff" text-anchor="middle">STOP</text></svg>`,
+
+        yield: `<svg viewBox="0 0 200 200" role="img" aria-label="Inverted triangle yield sign"><polygon points="100,178 16,30 184,30" fill="#fff" stroke="#c1272d" stroke-width="16"/><text x="100" y="92" font-size="34" font-family="Arial" font-weight="bold" fill="#c1272d" text-anchor="middle">YIELD</text></svg>`,
+
+        doNotEnter: `<svg viewBox="0 0 200 200" role="img" aria-label="Do not enter sign"><circle cx="100" cy="100" r="92" fill="#c1272d"/><rect x="40" y="86" width="120" height="28" rx="4" fill="#fff"/></svg>`,
+
+        wrongWay: `<svg viewBox="0 0 220 120" role="img" aria-label="Wrong way sign"><rect x="6" y="6" width="208" height="108" rx="8" fill="#c1272d" stroke="#fff" stroke-width="6"/><text x="110" y="52" font-size="30" font-family="Arial" font-weight="bold" fill="#fff" text-anchor="middle">WRONG</text><text x="110" y="90" font-size="30" font-family="Arial" font-weight="bold" fill="#fff" text-anchor="middle">WAY</text></svg>`,
+
+        noPassing: `<svg viewBox="0 0 200 160" role="img" aria-label="Pennant shaped no passing zone sign"><polygon points="10,12 190,12 12,150" fill="#ffd200" stroke="#000" stroke-width="4"/><text x="58" y="48" font-size="17" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">NO</text><text x="70" y="74" font-size="17" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">PASSING</text><text x="64" y="100" font-size="17" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">ZONE</text></svg>`,
+
+        school: `<svg viewBox="0 0 200 200" role="img" aria-label="Pentagon school zone sign with two children"><polygon points="100,8 192,80 156,190 44,190 8,80" fill="#7ac143" stroke="#000" stroke-width="4"/><g fill="#000"><circle cx="78" cy="78" r="10"/><path d="M70 92 h16 v34 h-7 v-22 h-2 v22 h-7 z"/><circle cx="118" cy="78" r="10"/><path d="M110 92 h16 v34 h-7 v-22 h-2 v22 h-7 z"/></g></svg>`,
+
+        rrAdvance: `<svg viewBox="0 0 200 200" role="img" aria-label="Round yellow railroad advance warning sign"><circle cx="100" cy="100" r="92" fill="#ffd200" stroke="#000" stroke-width="4"/><path d="M14 100 L186 100 M100 14 L100 186" stroke="#000" stroke-width="8"/><text x="58" y="92" font-size="40" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">R</text><text x="142" y="128" font-size="40" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">R</text><text x="142" y="78" font-size="34" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">X</text></svg>`,
+
+        merge: `<svg viewBox="0 0 180 200" role="img" aria-label="Lane merge warning sign"><rect x="20" y="10" width="140" height="180" transform="rotate(45 90 100)" fill="#ffd200" stroke="#000" stroke-width="4"/><g stroke="#000" stroke-width="9" fill="none"><path d="M72 158 L72 70"/><path d="M118 158 L118 110 Q118 80 86 70"/></g><polygon points="72,46 62,68 82,68" fill="#000"/></svg>`,
+
+        stopAhead: `<svg viewBox="0 0 180 200" role="img" aria-label="Stop ahead warning sign"><rect x="20" y="10" width="140" height="180" transform="rotate(45 90 100)" fill="#ffd200" stroke="#000" stroke-width="4"/><polygon points="76,58 104,58 124,78 124,106 104,126 76,126 56,106 56,78" fill="none" stroke="#000" stroke-width="5"/><text x="90" y="100" font-size="16" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">STOP</text><path d="M90 130 L90 158" stroke="#000" stroke-width="7"/><polygon points="90,168 82,150 98,150" fill="#000"/></svg>`,
+
+        slippery: `<svg viewBox="0 0 180 200" role="img" aria-label="Slippery when wet warning sign"><rect x="20" y="10" width="140" height="180" transform="rotate(45 90 100)" fill="#ffd200" stroke="#000" stroke-width="4"/><g><rect x="60" y="118" width="60" height="14" rx="6" fill="#000"/><circle cx="72" cy="138" r="7" fill="#000"/><circle cx="108" cy="138" r="7" fill="#000"/><path d="M64 116 Q70 70 96 70 Q120 70 116 116" fill="none" stroke="#000" stroke-width="6"/></g><path d="M70 150 q8 10 0 20 M90 150 q8 10 0 20 M110 150 q8 10 0 20" fill="none" stroke="#000" stroke-width="4"/></svg>`,
+
+        pedXing: `<svg viewBox="0 0 180 200" role="img" aria-label="Pedestrian crossing sign"><rect x="20" y="10" width="140" height="180" transform="rotate(45 90 100)" fill="#7ac143" stroke="#000" stroke-width="4"/><circle cx="90" cy="68" r="11" fill="#000"/><path d="M82 84 h16 l6 28 -7 2 -5 -18 v40 h-6 v-26 h-2 v26 h-6 v-40 l-5 18 -7 -2 z" fill="#000"/></svg>`,
+
+        bikeXing: `<svg viewBox="0 0 180 200" role="img" aria-label="Bicycle crossing sign"><rect x="20" y="10" width="140" height="180" transform="rotate(45 90 100)" fill="#ffd200" stroke="#000" stroke-width="4"/><g fill="none" stroke="#000" stroke-width="6"><circle cx="64" cy="120" r="20"/><circle cx="120" cy="120" r="20"/><path d="M64 120 L86 86 L112 86 M86 86 L120 120 M86 86 L78 120"/></g><circle cx="112" cy="78" r="7" fill="#000"/></svg>`,
+
+        noUturn: `<svg viewBox="0 0 180 200" role="img" aria-label="No U-turn sign"><rect x="14" y="14" width="152" height="172" rx="10" fill="#fff" stroke="#000" stroke-width="4"/><g fill="none" stroke="#000" stroke-width="11"><path d="M66 150 L66 95 a24 24 0 0 1 48 0 L114 120"/></g><polygon points="114,150 100,118 128,118" fill="#000"/><circle cx="90" cy="105" r="74" fill="none" stroke="#c1272d" stroke-width="10"/><line x1="40" y1="55" x2="140" y2="155" stroke="#c1272d" stroke-width="10"/></svg>`,
+
+        speed: `<svg viewBox="0 0 150 200" role="img" aria-label="Speed limit 30 sign"><rect x="14" y="10" width="122" height="180" rx="8" fill="#fff" stroke="#000" stroke-width="5"/><text x="75" y="52" font-size="22" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">SPEED</text><text x="75" y="80" font-size="22" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">LIMIT</text><text x="75" y="158" font-size="78" font-family="Arial" font-weight="bold" fill="#000" text-anchor="middle">30</text></svg>`,
+
+        doubleYellow: `<svg viewBox="0 0 240 150" role="img" aria-label="Two lanes separated by double solid yellow lines"><rect width="240" height="150" fill="#5a5f66"/><line x1="0" y1="71" x2="240" y2="71" stroke="#ffd200" stroke-width="5"/><line x1="0" y1="83" x2="240" y2="83" stroke="#ffd200" stroke-width="5"/><line x1="20" y1="22" x2="20" y2="44" stroke="#fff" stroke-width="5"/><line x1="20" y1="58" x2="20" y2="80" stroke="#fff" stroke-width="0"/><line x1="220" y1="106" x2="220" y2="128" stroke="#fff" stroke-width="5"/></svg>`,
+
+        brokenWhite: `<svg viewBox="0 0 240 150" role="img" aria-label="Lanes in same direction separated by a broken white line"><rect width="240" height="150" fill="#5a5f66"/><g stroke="#fff" stroke-width="6"><line x1="20" y1="75" x2="55" y2="75"/><line x1="90" y1="75" x2="125" y2="75"/><line x1="160" y1="75" x2="195" y2="75"/></g><polygon points="60,30 76,30 68,16" fill="#fff"/><polygon points="170,134 186,134 178,120" fill="#fff"/></svg>`,
+
+        trafficLight: `<svg viewBox="0 0 120 220" role="img" aria-label="Traffic signal showing yellow light"><rect x="30" y="10" width="60" height="200" rx="14" fill="#222"/><circle cx="60" cy="55" r="20" fill="#3a1f1f"/><circle cx="60" cy="110" r="20" fill="#ffd200"/><circle cx="60" cy="165" r="20" fill="#1f3a22"/></svg>`,
+
+        schoolBus: `<svg viewBox="0 0 260 150" role="img" aria-label="School bus with red stop lights flashing and stop arm extended"><rect x="20" y="40" width="190" height="70" rx="10" fill="#ffd200" stroke="#000" stroke-width="3"/><rect x="40" y="52" width="30" height="26" fill="#cfe8ff" stroke="#000" stroke-width="2"/><rect x="80" y="52" width="30" height="26" fill="#cfe8ff" stroke="#000" stroke-width="2"/><rect x="120" y="52" width="30" height="26" fill="#cfe8ff" stroke="#000" stroke-width="2"/><rect x="170" y="52" width="28" height="26" fill="#cfe8ff" stroke="#000" stroke-width="2"/><circle cx="60" cy="112" r="14" fill="#222"/><circle cx="175" cy="112" r="14" fill="#222"/><circle cx="30" cy="38" r="7" fill="#e23"/><circle cx="200" cy="38" r="7" fill="#e23"/><g><rect x="0" y="70" width="22" height="40" fill="#c1272d" stroke="#fff" stroke-width="2"/><text x="11" y="86" font-size="8" font-family="Arial" font-weight="bold" fill="#fff" text-anchor="middle">ST</text><text x="11" y="100" font-size="8" font-family="Arial" font-weight="bold" fill="#fff" text-anchor="middle">OP</text></g></svg>`,
+
+        roundabout: `<svg viewBox="0 0 180 180" role="img" aria-label="Roundabout / traffic circle warning sign"><rect x="18" y="8" width="144" height="144" transform="rotate(45 90 80)" fill="#ffd200" stroke="#000" stroke-width="4"/><g fill="none" stroke="#000" stroke-width="8"><circle cx="90" cy="80" r="30"/></g><g fill="#000"><polygon points="120,52 138,46 130,64"/><polygon points="60,108 42,114 50,96"/><polygon points="118,108 136,114 128,96"/></g></svg>`,
+
+        crosswalk: `<svg viewBox="0 0 240 160" role="img" aria-label="Pedestrian walking in a marked crosswalk in front of a car"><rect width="240" height="160" fill="#5a5f66"/><g fill="#fff"><rect x="86" y="14" width="16" height="132"/><rect x="112" y="14" width="16" height="132"/><rect x="138" y="14" width="16" height="132"/></g><g fill="#111"><rect x="6" y="64" width="64" height="40" rx="8"/><rect x="16" y="50" width="40" height="22" rx="6"/><circle cx="22" cy="108" r="9"/><circle cx="56" cy="108" r="9"/></g><g fill="#0b3d91"><circle cx="118" cy="60" r="9"/><path d="M110 74 h16 l5 24 -6 2 -4 -16 v36 h-5 v-22 h-2 v22 h-5 v-36 l-4 16 -6 -2 z"/></g></svg>`,
+
+      };
+
+      /* ------------------------------------------------------------------ */
+      /*  Question bank — 50 Florida-specific questions                      */
+      /*  answer = index into choices (0=A,1=B,2=C,3=D)                       */
+      /* ------------------------------------------------------------------ */
+      const QUESTIONS = [
+        { topic: "Road Signs", img: "stop",
+          q: "What does this sign mean?",
+          choices: ["Slow down and proceed if clear", "Come to a complete stop, then proceed when safe", "Stop only if other traffic is present", "Yield to traffic on your left"],
+          answer: 1,
+          ex: "A red octagon is a STOP sign. You must come to a complete stop at the marked line (or crosswalk/intersection), then proceed only when it is safe." },
+
+        { topic: "Road Signs", img: "yield",
+          q: "What should you do when you see this sign?",
+          choices: ["Stop completely and wait for a green light", "Speed up to merge quickly", "Slow down and give the right-of-way to traffic and pedestrians", "Make a U-turn"],
+          answer: 2,
+          ex: "A downward (inverted) triangle is a YIELD sign. Slow down, be ready to stop, and let cross traffic and pedestrians go first; stop only if necessary." },
+
+        { topic: "Road Signs", img: "doNotEnter",
+          q: "This sign tells you that:",
+          choices: ["You may enter with caution", "Do not enter — the roadway is closed to you", "One-way traffic ahead", "No parking allowed"],
+          answer: 1,
+          ex: "The white horizontal bar on a red circle is a DO NOT ENTER sign, posted at ramps and one-way streets where you must not drive in." },
+
+        { topic: "Road Signs", img: "wrongWay",
+          q: "If you see this sign facing you while driving, it means:",
+          choices: ["You are going the correct way on a one-way road", "You are driving against traffic — turn around safely", "A detour is ahead", "Construction zone ahead"],
+          answer: 1,
+          ex: "A WRONG WAY sign means you are headed against traffic. Pull over, stop, and safely turn around to avoid a head-on crash." },
+
+        { topic: "Lane Markings", img: "noPassing",
+          q: "This pennant-shaped sign on the left side of the road means:",
+          choices: ["No passing zone — do not pass other vehicles", "Passing permitted", "Narrow bridge ahead", "School zone"],
+          answer: 0,
+          ex: "The yellow pennant is a NO PASSING ZONE sign placed on the left side. You may not pass within the marked zone." },
+
+        { topic: "School Zones", img: "school",
+          q: "This pentagon-shaped sign warns you that:",
+          choices: ["A hospital is ahead", "You are entering a school zone or school crossing", "A playground is closed", "A pedestrian-only area is ahead"],
+          answer: 1,
+          ex: "The 5-sided (pentagon) yellow-green sign marks a school zone or school crossing. Slow down and watch for children." },
+
+        { topic: "Road Signs", img: "rrAdvance",
+          q: "This round yellow sign with an X and two R's means:",
+          choices: ["Hospital ahead", "Railroad crossing ahead — be prepared to stop", "Rest area ahead", "Road work ahead"],
+          answer: 1,
+          ex: "The round yellow RxR sign warns that a railroad crossing is ahead. Slow down, look, listen, and be ready to stop for a train." },
+
+        { topic: "Defensive Driving", img: "merge",
+          q: "What does this warning sign tell you?",
+          choices: ["A passing lane begins", "Traffic from another lane merges with yours — adjust speed and position", "The road splits into two", "No trucks allowed"],
+          answer: 1,
+          ex: "A merge sign means traffic entering from a side lane will join your lane. Adjust your speed and spacing to let vehicles merge safely." },
+
+        { topic: "Traffic Signals", img: "stopAhead",
+          q: "This yellow diamond sign means:",
+          choices: ["A stop sign or stop is ahead — slow down", "Stop immediately", "No stopping at any time", "Stop only for buses"],
+          answer: 0,
+          ex: "A STOP AHEAD warning sign tells you a stop sign or required stop is just ahead, often where visibility is limited. Begin slowing." },
+
+        { topic: "Defensive Driving", img: "slippery",
+          q: "This warning sign means:",
+          choices: ["Car wash ahead", "The road is slippery when wet — slow down", "Steep downhill grade", "Loose gravel"],
+          answer: 1,
+          ex: "The car with wavy skid lines warns that the road may be slippery when wet. Reduce speed and increase following distance." },
+
+        { topic: "Pedestrian & Bicycle Safety", img: "pedXing",
+          q: "This sign means:",
+          choices: ["No pedestrians allowed", "Watch for pedestrians crossing — yield to them", "Sidewalk ends", "Hiking trail ahead"],
+          answer: 1,
+          ex: "This pedestrian crossing sign means people may be crossing nearby. Slow down and yield the right-of-way to pedestrians." },
+
+        { topic: "Pedestrian & Bicycle Safety", img: "bikeXing",
+          q: "What does this sign indicate?",
+          choices: ["Bicycles are prohibited", "A bicycle crossing or shared roadway — watch for cyclists", "A bike repair shop ahead", "Motorcycles only"],
+          answer: 1,
+          ex: "This sign warns that bicyclists may be crossing or sharing the road. Slow down, give cyclists room, and be ready to yield." },
+
+        { topic: "Road Signs", img: "noUturn",
+          q: "This sign means:",
+          choices: ["U-turns allowed here", "No U-turn — you may not make a U-turn here", "No left turn", "Roundabout ahead"],
+          answer: 1,
+          ex: "The U-shaped arrow with a red slash is a NO U-TURN sign. You may not turn around to go the opposite direction at this location." },
+
+        { topic: "Speed Limits", img: "speed",
+          q: "On a road posted with this sign, you may:",
+          choices: ["Always drive exactly 30 mph regardless of conditions", "Drive up to 30 mph when conditions are good, and slower when needed", "Drive 30 mph only at night", "Drive faster than 30 mph if traffic is light"],
+          answer: 1,
+          ex: "A speed limit sign shows the maximum legal speed under ideal conditions. You must drive slower when weather, traffic, or road conditions require it." },
+
+        { topic: "Lane Markings", img: "doubleYellow",
+          q: "What do these double solid yellow center lines mean?",
+          choices: ["Passing is allowed for both directions", "Passing is not allowed in either direction", "One-way traffic only", "A center turn lane"],
+          answer: 1,
+          ex: "Two solid yellow lines separate opposing traffic and mean neither direction may cross to pass. You may cross only to turn into/out of a driveway." },
+
+        { topic: "Lane Markings", img: "brokenWhite",
+          q: "A broken white line between lanes means:",
+          choices: ["Traffic moves in opposite directions", "You may change lanes when it is safe", "No lane changes allowed", "The road is one lane only"],
+          answer: 1,
+          ex: "White lines separate traffic moving the same direction. A broken (dashed) white line means lane changes are permitted when safe." },
+
+        { topic: "Traffic Signals", img: "trafficLight",
+          q: "A steady yellow traffic light means:",
+          choices: ["Speed up to beat the red light", "The light is about to turn red — stop if you can do so safely", "Go, the intersection is clear", "Stop and wait for a flashing signal"],
+          answer: 1,
+          ex: "A steady yellow light warns that the signal is about to turn red. Stop safely if you can; do not try to race through the intersection." },
+
+        { topic: "School Zones", img: "schoolBus",
+          q: "On a two-lane road, a school bus ahead stops with red lights flashing and the stop arm out. You must:",
+          choices: ["Slow down and pass carefully", "Stop and remain stopped until the lights stop flashing and the arm is withdrawn", "Stop only if you see children", "Honk and continue"],
+          answer: 1,
+          ex: "On a two-way road, all traffic in both directions must stop for a stopped school bus with flashing red lights and stay stopped until the lights stop and the stop arm is withdrawn." },
+
+        { topic: "Right-of-Way", img: "roundabout",
+          q: "When entering the roundabout shown by this sign, you must:",
+          choices: ["Stop in the circle and wait", "Yield to traffic already in the roundabout, then enter when there is a gap", "Enter quickly without slowing", "Yield to traffic on your right only"],
+          answer: 1,
+          ex: "At a roundabout you yield to vehicles already circulating (coming from your left) and enter the gap. Traffic moves counter-clockwise." },
+
+        { topic: "Pedestrian & Bicycle Safety", img: "crosswalk",
+          q: "A pedestrian is crossing in the marked crosswalk in front of you, as shown. You must:",
+          choices: ["Proceed slowly around them", "Stop and yield the right-of-way to the pedestrian", "Honk so they hurry", "Turn right to avoid them"],
+          answer: 1,
+          ex: "Drivers must yield the right-of-way to pedestrians in a marked or unmarked crosswalk at an intersection. Stop and let them finish crossing." },
+
+        /* ---------- Text-only questions ---------- */
+        { topic: "Speed Limits", img: null,
+          q: "Unless otherwise posted, the speed limit in a Florida business or residential area is:",
+          choices: ["20 mph", "30 mph", "45 mph", "55 mph"],
+          answer: 1,
+          ex: "Under Florida law, the default speed limit in a business or residence district is 30 mph unless a different limit is posted." },
+
+        { topic: "Speed Limits", img: null,
+          q: "Unless otherwise posted, the speed limit on a Florida rural interstate highway is:",
+          choices: ["55 mph", "65 mph", "70 mph", "75 mph"],
+          answer: 2,
+          ex: "Florida's default speed limit on rural interstate highways is 70 mph. Limited-access highways are also 70 mph unless posted otherwise." },
+
+        { topic: "Right-of-Way", img: null,
+          q: "Two cars arrive at an open intersection (no signs or signals) at about the same time. Who has the right-of-way?",
+          choices: ["The faster car", "The car on the left", "The car on the right", "The larger vehicle"],
+          answer: 2,
+          ex: "At an open intersection where vehicles arrive at roughly the same time, you must yield to the vehicle on your right." },
+
+        { topic: "Right-of-Way", img: null,
+          q: "When an emergency vehicle approaches with lights and siren on, you should:",
+          choices: ["Speed up to clear the intersection", "Pull over to the right edge of the road and stop until it passes", "Stop immediately in your lane", "Continue at the same speed"],
+          answer: 1,
+          ex: "Yield to emergency vehicles by pulling over to the right-hand edge of the road and stopping until the vehicle has passed." },
+
+        { topic: "DUI Laws", img: null,
+          q: "In Florida, a driver 21 or older is legally impaired (DUI) at a blood alcohol level of:",
+          choices: ["0.02% or higher", "0.05% or higher", "0.08% or higher", "0.10% or higher"],
+          answer: 2,
+          ex: "For drivers 21 and older, the legal limit in Florida is a BAC of 0.08% or higher. You can still be charged below that if impaired." },
+
+        { topic: "DUI Laws", img: null,
+          q: "For a driver under 21 in Florida, it is illegal to drive with a blood alcohol level of:",
+          choices: ["0.02% or higher", "0.05% or higher", "0.08% or higher", "0.10% or higher"],
+          answer: 0,
+          ex: "Florida has a Zero Tolerance law: a driver under 21 with a BAC of 0.02% or higher will have their license suspended." },
+
+        { topic: "DUI Laws", img: null,
+          q: "Under Florida's Implied Consent law, refusing a lawful breath, blood, or urine test will result in:",
+          choices: ["No penalty", "A warning only", "An automatic driver license suspension", "A reduced fine"],
+          answer: 2,
+          ex: "By driving in Florida you give implied consent to chemical testing. Refusing a lawful test results in an automatic license suspension (one year for a first refusal)." },
+
+        { topic: "Insurance", img: null,
+          q: "Florida requires every registered vehicle owner to carry a minimum of:",
+          choices: ["$10,000 PIP and $10,000 PDL", "$5,000 PIP only", "$25,000 bodily injury liability", "No insurance is required"],
+          answer: 0,
+          ex: "Florida requires at least $10,000 in Personal Injury Protection (PIP) and $10,000 in Property Damage Liability (PDL)." },
+
+        { topic: "Insurance", img: null,
+          q: "Florida is a 'no-fault' insurance state. This means:",
+          choices: ["No one is ever responsible for a crash", "Your own PIP insurance pays your injury costs regardless of who caused the crash", "You never need insurance", "Only the at-fault driver pays everything"],
+          answer: 1,
+          ex: "Under no-fault, your own Personal Injury Protection covers your medical costs up to its limit no matter who caused the crash." },
+
+        { topic: "Defensive Driving", img: null,
+          q: "What is the recommended minimum following distance under good conditions?",
+          choices: ["At least a half-second", "At least 2 seconds behind the vehicle ahead", "One car length per trip", "It does not matter at low speeds"],
+          answer: 1,
+          ex: "Use the two-second rule: pick a fixed point and make sure at least two seconds pass after the car ahead reaches it. Increase the gap in bad weather." },
+
+        { topic: "Parking Rules", img: null,
+          q: "In Florida, you may not park within how many feet of a fire hydrant?",
+          choices: ["5 feet", "10 feet", "15 feet", "30 feet"],
+          answer: 2,
+          ex: "You may not park within 15 feet of a fire hydrant so firefighters can reach it in an emergency." },
+
+        { topic: "Parking Rules", img: null,
+          q: "When parking downhill next to a curb, you should turn your front wheels:",
+          choices: ["Straight ahead", "Toward the curb", "Away from the curb", "It does not matter"],
+          answer: 1,
+          ex: "Parking downhill, turn your wheels toward the curb so the car rolls into the curb if the brakes fail. (Uphill with a curb, turn them away.)" },
+
+        { topic: "School Zones", img: null,
+          q: "When driving through an active Florida school zone, you should:",
+          choices: ["Maintain the normal road speed limit", "Reduce to the posted school-zone speed and watch for children", "Only slow down if a crossing guard is present", "Use your horn to warn children"],
+          answer: 1,
+          ex: "When the school-zone lights are flashing or during posted times, slow to the posted school-zone limit (often 15–20 mph) and watch carefully for children." },
+
+        { topic: "School Zones", img: null,
+          q: "On a divided highway with a raised median or barrier, drivers traveling in the opposite direction from a stopped school bus must:",
+          choices: ["Always stop", "Are not required to stop, but should slow and use caution", "Stop only at night", "Pass at full speed"],
+          answer: 1,
+          ex: "On a divided highway separated by a raised barrier or median, only traffic moving in the same direction as the bus must stop. Oncoming traffic is not required to stop but should drive carefully." },
+
+        { topic: "Road Signs", img: null,
+          q: "At a railroad crossing without gates or lights, you must stop between:",
+          choices: ["5 and 10 feet from the nearest rail", "15 and 50 feet from the nearest rail", "75 and 100 feet from the nearest rail", "Right on top of the tracks"],
+          answer: 1,
+          ex: "If a train is approaching, stop no closer than 15 feet and no farther than 50 feet from the nearest rail, and do not cross until it is safe." },
+
+        { topic: "Defensive Driving", img: null,
+          q: "Florida's 'Move Over' law requires that when you approach a stopped emergency, law-enforcement, tow, or utility vehicle with lights flashing, you must:",
+          choices: ["Maintain speed and stay in your lane", "Move over to another lane if possible, or slow to 20 mph below the posted limit", "Stop completely in your lane", "Honk and pass quickly"],
+          answer: 1,
+          ex: "Florida's Move Over law: change lanes away from the stopped vehicle if you safely can; if you cannot, slow to 20 mph below the posted limit (or to 5 mph if the limit is 20 mph or less)." },
+
+        { topic: "Licensing Rules", img: null,
+          q: "What is the minimum age to get a Learner's License in Florida?",
+          choices: ["14", "15", "16", "18"],
+          answer: 1,
+          ex: "You may apply for a Learner's License at age 15 after passing the knowledge and vision/hearing tests and completing the TLSAE course." },
+
+        { topic: "Licensing Rules", img: null,
+          q: "A 16-year-old with a Florida intermediate license may not drive between:",
+          choices: ["6 p.m. and 6 a.m.", "11 p.m. and 6 a.m. (unless to/from work or with a 21+ licensed driver)", "8 p.m. and 8 a.m.", "There are no time restrictions"],
+          answer: 1,
+          ex: "Licensed 16-year-olds may not drive between 11 p.m. and 6 a.m. unless accompanied by a licensed driver 21 or older, or driving to/from work." },
+
+        { topic: "Crashes", img: null,
+          q: "You must immediately report a crash to law enforcement in Florida if:",
+          choices: ["The damage is under $50", "There are injuries, a death, or apparent property damage of $500 or more", "Only if another driver asks", "Only on interstate highways"],
+          answer: 1,
+          ex: "Report a crash to police if it causes injury or death, or if property damage appears to be $500 or more. Always exchange information." },
+
+        { topic: "Crashes", img: null,
+          q: "If you are involved in a crash, leaving the scene before fulfilling your legal duties is:",
+          choices: ["Allowed if you are not at fault", "A serious offense (hit-and-run) that can lead to license revocation and criminal charges", "Fine as long as no one was hurt", "Allowed if you leave a note only"],
+          answer: 1,
+          ex: "Leaving the scene of a crash involving injury or damage without stopping and exchanging information is a hit-and-run, a serious crime in Florida." },
+
+        { topic: "Pedestrian & Bicycle Safety", img: null,
+          q: "A pedestrian using a white cane or guide dog at an intersection:",
+          choices: ["Must wait for all cars", "Has the right-of-way; you must stop and let them cross", "Should be honked at", "Has no special protection"],
+          answer: 1,
+          ex: "Blind or visually impaired pedestrians using a white cane or guide dog have the absolute right-of-way. Always stop and yield to them." },
+
+        { topic: "Pedestrian & Bicycle Safety", img: null,
+          q: "In Florida, a bicyclist riding on the road:",
+          choices: ["Must always ride on the sidewalk", "Has the same rights and responsibilities as a motor-vehicle driver", "Can ignore traffic signals", "Is never allowed in traffic lanes"],
+          answer: 1,
+          ex: "A bicycle is a vehicle in Florida. Cyclists have the same rights and must obey the same traffic laws as drivers, and you must give them at least 3 feet when passing." },
+
+        { topic: "Traffic Signals", img: null,
+          q: "A flashing red traffic light means:",
+          choices: ["Speed up", "Stop, then proceed when safe (treat it like a stop sign)", "The light is broken — ignore it", "Yield only"],
+          answer: 1,
+          ex: "A flashing red light has the same meaning as a stop sign: come to a full stop, then proceed when the way is clear." },
+
+        { topic: "Defensive Driving", img: null,
+          q: "If your vehicle begins to hydroplane on a wet road, you should:",
+          choices: ["Brake hard immediately", "Ease off the gas and steer straight until you regain traction", "Steer sharply to one side", "Accelerate to push through the water"],
+          answer: 1,
+          ex: "If you hydroplane, take your foot off the gas, keep the steering wheel straight, and avoid hard braking until the tires regain contact with the road." },
+
+        { topic: "Defensive Driving", img: null,
+          q: "In Florida you must turn on your headlights:",
+          choices: ["Only after midnight", "From sunset to sunrise, and any time rain or fog reduces visibility", "Only on interstates", "Only when other cars have theirs on"],
+          answer: 1,
+          ex: "Headlights are required from sunset to sunrise and whenever windshield wipers are in continuous use due to rain, smoke, or fog (low-visibility conditions)." },
+
+        { topic: "Right-of-Way", img: null,
+          q: "When you want to make a left turn at an intersection with oncoming traffic, you must:",
+          choices: ["Turn first because you are going left", "Yield to oncoming traffic and pedestrians before turning", "Speed up to turn before they reach you", "Stop in the middle of the intersection and wait for a red light"],
+          answer: 1,
+          ex: "When turning left, you must yield the right-of-way to oncoming vehicles and to pedestrians crossing your path before completing the turn." },
+
+        { topic: "Parking Rules", img: null,
+          q: "You should not park within how many feet of a stop sign or traffic signal at an intersection?",
+          choices: ["10 feet", "20 feet", "30 feet", "50 feet"],
+          answer: 2,
+          ex: "Do not park within 30 feet of a stop sign, yield sign, or traffic signal so you do not block other drivers' view of it." },
+
+        { topic: "Licensing Rules", img: null,
+          q: "Florida law requires which occupants to wear a safety belt?",
+          choices: ["Only the driver", "The driver, all front-seat occupants, and all passengers under 18", "Only children under 5", "No one is required to"],
+          answer: 1,
+          ex: "Florida's seat belt law requires the driver, all front-seat passengers, and every passenger under 18 (in any seat) to be properly restrained." },
+
+        { topic: "Licensing Rules", img: null,
+          q: "Florida's child restraint law requires children age 3 and younger to be secured in:",
+          choices: ["A regular seat belt", "A separate federally approved car seat (child safety seat)", "An adult's lap", "Nothing special"],
+          answer: 1,
+          ex: "Children 3 and under must ride in a separate federally approved child safety seat; ages 4–5 must use a car seat or booster seat." },
+
+        { topic: "Defensive Driving", img: null,
+          q: "Texting while driving in Florida is:",
+          choices: ["Legal at red lights only", "A primary offense — you can be pulled over and ticketed for it", "Only illegal for teen drivers", "Allowed on local roads"],
+          answer: 1,
+          ex: "Texting while driving is a primary offense in Florida; an officer can stop and cite you for it, and it is fully banned in school and work zones." },
+
+              ];
+
+      /* ------------------------------------------------------------------ */
+      /*  App logic                                                          */
+      /* ------------------------------------------------------------------ */
+      const quizEl = document.getElementById("quiz");
+      const progressFill = document.getElementById("progressFill");
+      const progressLabel = document.getElementById("progressLabel");
+      const submitBtn = document.getElementById("submitBtn");
+      const results = document.getElementById("results");
+      const toastEl = document.getElementById("toast");
+      let graded = false;
+
+      function letter(i) { return ["A", "B", "C", "D"][i]; }
+
+      // Working copy whose choice order is shuffled each build so the correct
+      // answer is spread across A–D (and varies on retakes), like the real exam.
+      let DECK = [];
+      function shuffleDeck() {
+        DECK = QUESTIONS.map((item) => {
+          const order = item.choices.map((c, i) => ({ c, correct: i === item.answer }));
+          for (let i = order.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [order[i], order[j]] = [order[j], order[i]];
+          }
+          return {
+            topic: item.topic,
+            img: item.img,
+            q: item.q,
+            ex: item.ex,
+            choices: order.map((o) => o.c),
+            answer: order.findIndex((o) => o.correct),
+          };
+        });
+      }
+
+      function buildQuiz() {
+        shuffleDeck();
+        quizEl.innerHTML = "";
+        DECK.forEach((item, qi) => {
+          const card = document.createElement("div");
+          card.className = "q-card";
+          card.id = "q" + qi;
+
+          const imgHtml = item.img && SVG[item.img]
+            ? `<div class="q-image">${SVG[item.img]}</div>` : "";
+
+          const choicesHtml = item.choices.map((c, ci) => `
+            <label class="choice" data-q="${qi}" data-c="${ci}">
+              <input type="radio" name="q${qi}" value="${ci}" />
+              <span class="letter">${letter(ci)}</span>
+              <span class="text">${c}</span>
+            </label>`).join("");
+
+          card.innerHTML = `
+            <div class="q-head">
+              <span class="q-num">Question ${qi + 1}</span>
+              <span class="q-topic">${item.topic}</span>
+            </div>
+            <div class="q-text">${item.q}</div>
+            ${imgHtml}
+            <div class="choices">${choicesHtml}</div>
+            <div class="explain" id="ex${qi}"></div>`;
+          quizEl.appendChild(card);
+        });
+
+        quizEl.querySelectorAll(".choice").forEach((label) => {
+          label.addEventListener("click", () => {
+            if (graded) return;
+            const qi = label.dataset.q;
+            quizEl.querySelectorAll(`.choice[data-q="${qi}"]`).forEach((l) => l.classList.remove("selected"));
+            label.classList.add("selected");
+            label.querySelector("input").checked = true;
+            updateProgress();
+          });
+        });
+      }
+
+      function updateProgress() {
+        let answered = 0;
+        QUESTIONS.forEach((_, qi) => {
+          if (quizEl.querySelector(`input[name="q${qi}"]:checked`)) answered++;
+        });
+        const pct = (answered / QUESTIONS.length) * 100;
+        progressFill.style.width = pct + "%";
+        progressLabel.textContent = `${answered} / ${QUESTIONS.length} answered`;
+        return answered;
+      }
+
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("show");
+        clearTimeout(toastEl._t);
+        toastEl._t = setTimeout(() => toastEl.classList.remove("show"), 2600);
+      }
+
+      function gradeTest() {
+        const answered = updateProgress();
+        if (answered < QUESTIONS.length) {
+          const first = QUESTIONS.findIndex((_, qi) => !quizEl.querySelector(`input[name="q${qi}"]:checked`));
+          showToast(`Please answer all questions. ${QUESTIONS.length - answered} left.`);
+          if (first >= 0) document.getElementById("q" + first).scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+
+        graded = true;
+        let score = 0;
+        const missedByTopic = {};
+
+        DECK.forEach((item, qi) => {
+          const chosen = parseInt(quizEl.querySelector(`input[name="q${qi}"]:checked`).value, 10);
+          const correct = item.answer;
+          const isRight = chosen === correct;
+          if (isRight) score++;
+          else missedByTopic[item.topic] = (missedByTopic[item.topic] || 0) + 1;
+
+          quizEl.querySelectorAll(`.choice[data-q="${qi}"]`).forEach((label) => {
+            const ci = parseInt(label.dataset.c, 10);
+            label.classList.add("locked");
+            label.classList.remove("selected");
+            if (ci === correct) label.classList.add("correct");
+            else if (ci === chosen) label.classList.add("incorrect");
+          });
+
+          const ex = document.getElementById("ex" + qi);
+          ex.className = "explain show" + (isRight ? "" : " miss");
+          ex.innerHTML = `<b>${isRight ? "Correct" : "Correct answer: " + letter(correct)}.</b> ${item.ex}`;
+        });
+
+        submitBtn.parentElement.style.display = "none";
+        renderResults(score, missedByTopic);
+        results.classList.add("show");
+        results.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function renderResults(score, missedByTopic) {
+        document.getElementById("scoreNum").textContent = score;
+
+        // animate ring
+        const circumference = 2 * Math.PI * 66;
+        const ring = document.getElementById("ringProgress");
+        const offset = circumference * (1 - score / QUESTIONS.length);
+        let color = "#1e8e3e";
+        if (score < 30) color = "#d93025";
+        else if (score < 40) color = "#ff7a00";
+        ring.style.stroke = color;
+        setTimeout(() => { ring.style.transition = "stroke-dashoffset 1s ease"; ring.style.strokeDashoffset = offset; }, 120);
+
+        const verdict = document.getElementById("verdict");
+        const verdictMsg = document.getElementById("verdictMsg");
+        let band;
+        if (score >= 40) {
+          band = "pass";
+          verdict.textContent = "You're likely ready! ✅";
+          verdict.className = "verdict pass";
+          verdictMsg.textContent = "You scored in the passing range (80%+). Keep reviewing any missed topics before exam day.";
+        } else if (score >= 30) {
+          band = "warn";
+          verdict.textContent = "Almost there — review your weak areas";
+          verdict.className = "verdict warn";
+          verdictMsg.textContent = "You're close, but below the 40/50 (80%) needed to pass. Focus on the topics listed below.";
+        } else {
+          band = "fail";
+          verdict.textContent = "Keep studying the Florida Handbook";
+          verdict.className = "verdict fail";
+          verdictMsg.textContent = "Spend more time with the official Florida Driver License Handbook, then try again.";
+        }
+
+        document.querySelectorAll(".guide .row").forEach((r) => r.classList.toggle("active", r.dataset.band === band));
+
+        const chips = document.getElementById("topicChips");
+        const box = document.getElementById("topicReview");
+        const topics = Object.keys(missedByTopic).sort((a, b) => missedByTopic[b] - missedByTopic[a]);
+        if (topics.length === 0) {
+          box.classList.add("empty");
+          chips.innerHTML = "<p>Perfect score — no topics to review. Outstanding! 🎉</p>";
+        } else {
+          box.classList.remove("empty");
+          chips.innerHTML = topics
+            .map((t) => `<span class="topic-chip">${t} <b>${missedByTopic[t]}</b></span>`)
+            .join("");
+        }
+      }
+
+      document.getElementById("submitBtn").addEventListener("click", gradeTest);
+
+      document.getElementById("reviewBtn").addEventListener("click", () => {
+        document.getElementById("q0").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      document.getElementById("retakeBtn").addEventListener("click", () => {
+        graded = false;
+        results.classList.remove("show");
+        submitBtn.parentElement.style.display = "flex";
+        buildQuiz();
+        updateProgress();
+        const ring = document.getElementById("ringProgress");
+        ring.style.transition = "none";
+        ring.style.strokeDashoffset = 2 * Math.PI * 66;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      buildQuiz();
+      updateProgress();
+    </script>
+  </body>
+</html>

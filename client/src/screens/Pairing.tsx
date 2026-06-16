@@ -12,12 +12,19 @@ export default function Pairing() {
   const [copied, setCopied] = useState<'code' | 'link' | null>(null);
 
   useEffect(() => {
+    // If you've already created a couple and are waiting for your partner,
+    // show your existing invite code straight away.
+    if (me?.couple?.inviteCode) {
+      setCode(me.couple.inviteCode);
+      setTab('invite');
+      return;
+    }
     const pending = localStorage.getItem('pending_invite');
     if (pending) {
       setJoinCode(pending);
       setTab('join');
     }
-  }, []);
+  }, [me?.couple?.inviteCode]);
 
   const generate = async () => {
     setError('');

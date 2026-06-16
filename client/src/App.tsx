@@ -28,7 +28,10 @@ export default function App() {
   }
 
   const signedIn = !!me;
-  const paired = !!me?.couple;
+  // "Paired" means a partner has actually joined — not just that you created a
+  // couple/invite code. Otherwise the inviter would be redirected away from the
+  // pairing screen before they could see and share their code.
+  const paired = !!me?.partner;
 
   return (
     <CelebrationProvider>

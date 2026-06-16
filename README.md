@@ -55,34 +55,42 @@ npm start       # server serves the API + the built app on :4000
 ## ☁️ Deploy for free (so you can both use it)
 
 The whole thing is **one Node service** that serves the API *and* the app, so
-any free Node host works. Recommended free options:
+any free Node host works. This repo includes ready-made deploy configs:
+[`render.yaml`](render.yaml) (Render blueprint) and
+[`Dockerfile`](Dockerfile) + [`fly.toml`](fly.toml) (Fly.io).
 
-### Option A — Render (free web service)
+### Option A — Render (simplest, one blueprint)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
 1. Push this repo to GitHub.
-2. On [render.com](https://render.com) → **New → Web Service** → connect the repo.
-3. Settings:
-   - **Build command:** `npm install && npm run build`
-   - **Start command:** `npm start`
-4. Add environment variables (from **Environment**):
-   - `JWT_SECRET` = a long random string
-   - `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (from `npm run keys`)
-   - `TZ` = your timezone, e.g. `America/New_York` (controls when days/weeks reset)
-5. Deploy, then open the URL on both phones and **Add to Home Screen**.
+2. On [render.com](https://render.com) → **New → Blueprint** → connect this repo.
+   Render reads `render.yaml` and pre-fills the build/start commands, generates
+   `JWT_SECRET` automatically, and prompts you to paste the two `VAPID_*` values
+   (run `npm run keys` to get them).
+3. Click **Apply**, then open the URL on both phones and **Add to Home Screen**.
 
-> Note: Render's free disk is ephemeral, so the SQLite database resets on
-> redeploys. For permanent storage, mount a free volume (e.g. **Fly.io**) and set
-> `DB_PATH` to a path on that volume.
+> Note: Render's free disk is ephemeral, so the SQLite database can reset on
+> redeploys. For permanent storage, use Fly.io below.
 
-### Option B — Fly.io (free volume = persistent data)
+### Option B — Fly.io (free volume = permanent data) ⭐ recommended
 
-1. Install the Fly CLI and run `fly launch` (Node detected automatically).
-2. Create a volume: `fly volumes create data --size 1` and mount it at `/data`.
-3. Set `DB_PATH=/data/dainty.db` plus the same env vars as above
-   (`fly secrets set JWT_SECRET=... VAPID_PUBLIC_KEY=...`).
-4. `fly deploy`.
+```bash
+# install the Fly CLI first: https://fly.io/docs/flyctl/install/
+fly launch --no-deploy           # pick a unique app name (updates fly.toml)
+fly volumes create data --size 1 # free 1GB volume for the database
+fly secrets set \
+  JWT_SECRET="$(openssl rand -base64 48)" \
+  VAPID_PUBLIC_KEY=... \
+  VAPID_PRIVATE_KEY=... \
+  VAPID_SUBJECT=mailto:you@example.com
+fly deploy
+```
 
-Other free Node hosts (Railway, Koyeb, etc.) work the same way: build with
+`fly.toml` already mounts the volume at `/data` and points `DB_PATH` there, so
+your goals persist across deploys and restarts.
+
+Other free Node hosts (Koyeb, etc.) work the same way: build with
 `npm install && npm run build`, start with `npm start`, set the env vars, and —
 if the host supports it — point `DB_PATH` at a persistent volume.
 

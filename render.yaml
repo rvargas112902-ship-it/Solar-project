@@ -1,0 +1,24 @@
+# Render.com Blueprint — one-click deploy of Dainty Goals (free plan).
+# In Render: New → Blueprint → connect this repo. Render reads this file,
+# then asks you to paste the VAPID_* values (from `npm run keys`).
+services:
+  - type: web
+    name: dainty-goals
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: JWT_SECRET
+        generateValue: true
+      - key: TZ
+        value: America/New_York
+      - key: VAPID_SUBJECT
+        value: mailto:you@example.com
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false

@@ -1,0 +1,26 @@
+# Fly.io config — free, with a persistent volume so your goals never reset.
+# Setup:
+#   fly launch --no-deploy        # pick a unique app name; it updates this file
+#   fly volumes create data --size 1
+#   fly secrets set JWT_SECRET=... VAPID_PUBLIC_KEY=... VAPID_PRIVATE_KEY=... VAPID_SUBJECT=mailto:you@example.com
+#   fly deploy
+app = "dainty-goals"          # change to your own unique name
+primary_region = "iad"        # pick a region near you (e.g. lhr, ams, sjc)
+
+[build]
+
+[env]
+  PORT = "4000"
+  DB_PATH = "/data/dainty.db"
+  TZ = "America/New_York"
+
+[http_service]
+  internal_port = 4000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[mounts]]
+  source = "data"
+  destination = "/data"

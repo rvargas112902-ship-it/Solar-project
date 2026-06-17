@@ -1,5 +1,6 @@
 // Dainty Goals service worker — minimal offline shell + web push.
-const CACHE = 'dainty-v1';
+// Bump CACHE whenever the shell logic changes so clients self-update.
+const CACHE = 'dainty-v2';
 const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon-192.png'];
 
 self.addEventListener('install', (event) => {

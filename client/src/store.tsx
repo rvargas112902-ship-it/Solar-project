@@ -40,6 +40,30 @@ export const useStore = () => {
   return c;
 };
 
+// Cached session + goals so the app stays signed in and shows instantly on
+// reopen — even offline or while a sleeping server wakes up.
+const ME_KEY = 'dainty_me';
+const GOALS_KEY = 'dainty_goals';
+function loadCache<T>(key: string): T | null {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch {
+    return null;
+  }
+}
+function saveCache(key: string, value: unknown) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {}
+}
+function clearCache() {
+  try {
+    localStorage.removeItem(ME_KEY);
+    localStorage.removeItem(GOALS_KEY);
+  } catch {}
+}
+
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [me, setMe] = useState<MeResponse | null>(null);
@@ -50,13 +74,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const refreshMe = useCallback(async () => {
     const data = await api.get<MeResponse>('/me');
+    if (data.token) setToken(data.token); // slide the session so it never expires with daily use
     setMe(data);
+    saveCache(ME_KEY, data);
     return data;
   }, []);
 
   const refreshGoals = useCallback(async () => {
     const data = await api.get<{ goals: Goal[] }>('/goals');
     setGoals(data.goals);
+    saveCache(GOALS_KEY, data.goals);
   }, []);
 
   // ---- realtime ----
@@ -106,21 +133,46 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // ---- bootstrap ----
   useEffect(() => {
+    const doLogout = () => {
+      disconnectWs();
+      setToken(null);
+      clearCache();
+      setMe(null);
+      setGoals([]);
+    };
+    const onUnauthorized = () => doLogout();
+    window.addEventListener('dainty:unauthorized', onUnauthorized);
+
     (async () => {
       if (getToken()) {
+        // Restore the last saved session immediately so you're not bounced to
+        // the login screen while the server is waking up or you're offline.
+        const cachedMe = loadCache<MeResponse>(ME_KEY);
+        if (cachedMe) {
+          setMe(cachedMe);
+          const cachedGoals = loadCache<Goal[]>(GOALS_KEY);
+          if (cachedGoals) setGoals(cachedGoals);
+          if (cachedMe.partner) connectWs();
+        }
         try {
           const data = await refreshMe();
           if (data.couple) {
             await refreshGoals();
             connectWs();
           }
-        } catch {
-          setToken(null);
+        } catch (e: any) {
+          // Only sign out when the token is genuinely invalid (401). A network
+          // error or a sleeping free-tier server must keep you logged in.
+          if (e?.status === 401) doLogout();
         }
       }
       setReady(true);
     })();
-    return () => disconnectWs();
+
+    return () => {
+      window.removeEventListener('dainty:unauthorized', onUnauthorized);
+      disconnectWs();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -160,6 +212,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     disconnectWs();
     setToken(null);
+    clearCache();
     setMe(null);
     setGoals([]);
   }, [disconnectWs]);

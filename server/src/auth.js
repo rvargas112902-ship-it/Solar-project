@@ -4,7 +4,7 @@ const JWT_SECRET =
   process.env.JWT_SECRET || 'dainty-dev-secret-change-me-in-production';
 
 export function signToken(userId) {
-  return jwt.sign({ uid: userId }, JWT_SECRET, { expiresIn: '90d' });
+  return jwt.sign({ uid: userId }, JWT_SECRET, { expiresIn: '365d' });
 }
 
 export function verifyToken(token) {

@@ -1,6 +1,7 @@
 import express from 'express';
 import { nanoid, customAlphabet } from 'nanoid';
 import { broadcastToCouple } from '../ws.js';
+import { signToken } from '../auth.js';
 
 const codeGen = customAlphabet('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', 6);
 
@@ -27,6 +28,8 @@ export default function coupleRoutes(db, auth, publicUser) {
       user: publicUser(req.user),
       partner: partnerOf(req.user),
       couple: couple ? { id: couple.id, inviteCode: couple.invite_code } : null,
+      // Re-issue a fresh token on every load so an active session never expires.
+      token: signToken(req.user.id),
     });
   });
 

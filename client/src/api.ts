@@ -27,7 +27,17 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     }
   }
   if (!res.ok) {
-    throw new Error(data?.error || `Something went wrong (${res.status})`);
+    const err = new Error(data?.error || `Something went wrong (${res.status})`) as Error & {
+      status?: number;
+    };
+    err.status = res.status;
+    // A real auth failure (expired/invalid token) — let the app sign out.
+    if (res.status === 401) {
+      try {
+        window.dispatchEvent(new Event('dainty:unauthorized'));
+      } catch {}
+    }
+    throw err;
   }
   return data as T;
 }

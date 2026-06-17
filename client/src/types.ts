@@ -43,6 +43,7 @@ export interface MeResponse {
   user: User;
   partner: Partner | null;
   couple: Couple | null;
+  token?: string;
 }
 
 export interface Summary {
